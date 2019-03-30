@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, View, Text, Button, Platform, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Text, Button, Platform, StatusBar, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Tile } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -38,7 +38,8 @@ class Details extends Component {
     } = this.props.navigation.state.params;
 
     const renderMeals = meals.map(meal=>{
-      const handleAddMeal = meal => {
+      // 增加餐點
+      const handleIncreaseMeal = meal => {
         //找到現有的餐點
         if(this.state.myOrder.meal.find(x => x.name === meal.name)){
           let oldStates = this.state.myOrder.meal;
@@ -62,6 +63,27 @@ class Details extends Component {
         }
       }
 
+      // 減少餐點
+      const handleDecreaseMeal = meal => {
+        //找到現有的餐點
+        if(this.state.myOrder.meal.find(x => x.name === meal.name)){
+          let oldStates = this.state.myOrder.meal;
+          if(oldStates.find(x => x.name === meal.name).count === 1){
+            this.setState({
+              meal: oldStates.splice(oldStates.findIndex(x => x.name === meal.name),1)
+            },()=>console.log(this.state.myOrder.meal));
+          } else {
+            this.setState({
+              meal: oldStates.find(x => x.name === meal.name).count -= 1
+            },()=>console.log(this.state.myOrder.meal));
+          }
+        } 
+        //第一次出現餐點
+        else {
+          return null;
+        }
+      }
+
       return(
         <View style={styles.meal} key={meal.name}>
           <View style={{flex: 1, flexDirection: 'row'}}>
@@ -73,9 +95,12 @@ class Details extends Component {
               <Text style={styles.mealPrice}>{`$${meal.price}`}</Text>
             </View>
           </View>
-          <View style={{flex: 1}}>
-            <TouchableOpacity onPress={()=>handleAddMeal(meal)}>
-              <Text>+</Text>
+          <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
+            <TouchableOpacity style={styles.addButton} onPress={()=>handleDecreaseMeal(meal)}>
+              <Text style={styles.addButtonText}>−</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.addButton} onPress={()=>handleIncreaseMeal(meal)}>
+              <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -83,24 +108,32 @@ class Details extends Component {
     })
 
     return (
-      <ScrollView style={{ backgroundColor: 'rgb(249,249,249)' }}>
-        <StatusBar backgroundColor="transparent" barStyle="light-content" />
-        <Tile
-          imageSrc={{ uri: image }}
-          featured
-        />
-        <View style={ styles.container }>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.description}>{description}</Text>
-          <Text style={[styles.name, {marginBottom: 20}]}>餐點</Text>
-          {renderMeals}
-          <Button
-            title="下一步"
-            style={styles.button}
-            onPress={this.handleSubmit}
+      <View style={{ flex: 1 }}>
+        <ScrollView style={{ backgroundColor: 'rgb(249,249,249)' }}>
+          <StatusBar backgroundColor="transparent" barStyle="light-content" />
+          <Tile
+            imageSrc={{ uri: image }}
+            featured
           />
-        </View>
-      </ScrollView>
+          <View style={ styles.container }>
+            <Text style={styles.name}>{name}</Text>
+            <Text style={styles.description}>{description}</Text>
+            <Text style={[styles.name, {marginBottom: 20}]}>餐點</Text>
+            {renderMeals}
+          </View>
+        </ScrollView>
+        {this.state.myOrder.meal[0]
+          ?<View style={styles.buttonBox}>
+            <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
+              <View style={{ flex: 1}}></View>
+              <Text style={styles.buttonText}>下一步</Text>
+              <Text style={styles.buttonPrice}>$ 87</Text>
+            </TouchableOpacity>
+           </View>
+          :null
+        }
+        
+      </View>
     );
   };
 }
@@ -125,8 +158,7 @@ const styles = StyleSheet.create({
     height: 70,
     width: '100%',
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: 'black',
+    borderBottomWidth: 1.5,
     borderColor: 'rgb(151,151,151)',
     paddingTop: 5
   },
@@ -144,8 +176,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgb(64,64,64)'
   },
+  addButton: {
+    width: 30,
+    height: 30,
+    marginLeft: 20,
+    borderWidth: 1.5,
+    borderColor: 'rgb(151,151,151)',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  addButtonText: {
+    fontSize: 30,
+    lineHeight: 30,
+    textAlign: 'center',
+    color: 'rgb(151,151,151)',
+    fontWeight: '300'
+  },
+  buttonBox: {
+    backgroundColor: 'rgb(141,216,227)',
+    width: '100%',
+    height: 50,
+    position: 'absolute',
+    bottom: 0,
+    marginBottom: 34,
+
+  },
   button: {
-    width: '100%'
+    flexDirection: 'row',
+    width: '100%',
+    height: '100%'
+  },
+  buttonText: {
+    flex: 1,
+    fontSize: 16,
+    textAlign: 'center',
+    padding: 17,
+    color: 'white'
+  },
+  buttonPrice: {
+    flex: 1,
+    fontSize: 16,
+    textAlign: 'center',
+    paddingVertical: 17,
+    color: 'white'
   }
 });
 

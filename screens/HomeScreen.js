@@ -48,14 +48,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 24,
-    paddingVertical: 5,
+    paddingVertical: 17,
     justifyContent: 'space-between'
   },
   card: {
     width: cardWidth,
     height: 200,
     backgroundColor: 'white',
-    marginTop: 24,
+    marginVertical: 12,
     padding: '2%',
     borderRadius: 5,
     shadowOffset: { width: 2, height: 5 },
