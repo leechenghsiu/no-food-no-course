@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, View, Text, Button, Platform, StatusBar, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { ScrollView, View, Text, Platform, StatusBar, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Tile } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -20,14 +20,25 @@ class Details extends Component {
   };
 
   state = {
-    myOrder: {
-      meal:[],
-      total: 0
-    }
+    meal:[],
+    total: 0
   }
 
   handleSubmit = () => {
-    this.props.navigation.navigate('Confirm',{ meal: this.state.myOrder.meal })
+    this.props.navigation.navigate('Confirm',{ meal: this.state.meal })
+  }
+
+  handleCount = () => {
+    if(!this.state.meal[0]){
+      this.setState({
+        total: 0
+      })
+    } else {
+      const sum = this.state.meal.map(x => x.price * x.count).reduce((a,b) => a+b);
+      this.setState({
+        total: sum
+      })
+    }
   }
 
   render() {
@@ -41,41 +52,45 @@ class Details extends Component {
       // 增加餐點
       const handleIncreaseMeal = meal => {
         //找到現有的餐點
-        if(this.state.myOrder.meal.find(x => x.name === meal.name)){
-          let oldStates = this.state.myOrder.meal;
+        if(this.state.meal.find(x => x.name === meal.name)){
+          let oldStates = this.state.meal;
           oldStates.find(x => x.name === meal.name).count += 1;
           this.setState({
-            meal: {
+            meal: [
               ...oldStates
-            }
-          },()=>console.log(this.state.myOrder.meal));
+            ]
+          },()=>this.handleCount());
         } 
         //第一次出現餐點
         else {
           this.setState({
-            myOrder: {
-              meal: [
-                ...this.state.myOrder.meal,
-                { name: meal.name, price: meal.price, count: 1 }
-              ]
-            }
-          },()=>console.log(this.state.myOrder.meal))
+            meal: [
+              ...this.state.meal,
+              { name: meal.name, price: meal.price, count: 1 }
+            ]
+          },()=>this.handleCount())
         }
       }
 
       // 減少餐點
       const handleDecreaseMeal = meal => {
         //找到現有的餐點
-        if(this.state.myOrder.meal.find(x => x.name === meal.name)){
-          let oldStates = this.state.myOrder.meal;
+        if(this.state.meal.find(x => x.name === meal.name)){
+          let oldStates = this.state.meal;
           if(oldStates.find(x => x.name === meal.name).count === 1){
+            oldStates.splice(oldStates.findIndex(x => x.name === meal.name),1)
             this.setState({
-              meal: oldStates.splice(oldStates.findIndex(x => x.name === meal.name),1)
-            },()=>console.log(this.state.myOrder.meal));
+              meal: [
+                ...oldStates
+              ]
+            },()=>this.handleCount());
           } else {
+            oldStates.find(x => x.name === meal.name).count -= 1;
             this.setState({
-              meal: oldStates.find(x => x.name === meal.name).count -= 1
-            },()=>console.log(this.state.myOrder.meal));
+              meal: [
+                ...oldStates
+              ]
+            },()=>this.handleCount());
           }
         } 
         //第一次出現餐點
@@ -87,12 +102,12 @@ class Details extends Component {
       return(
         <View style={styles.meal} key={meal.name}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={[{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: 8, height: 16 , borderRadius: 2},this.state.myOrder.meal.find(x => x.name === meal.name)?{display: 'flex'}:{backgroundColor: 'transparent'}]}>
-              <Text style={styles.mealCount}>{this.state.myOrder.meal.find(x => x.name === meal.name)?this.state.myOrder.meal.find(x => x.name === meal.name).count:''}</Text>
+            <View style={[{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: 8, height: 16 , borderRadius: 2},this.state.meal.find(x => x.name === meal.name)?{display: 'flex'}:{backgroundColor: 'transparent'}]}>
+              <Text style={styles.mealCount}>{this.state.meal.find(x => x.name === meal.name)?this.state.meal.find(x => x.name === meal.name).count:''}</Text>
             </View>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.mealName}>{meal.name}</Text>
-              <Text style={styles.mealPrice}>{`$${meal.price}`}</Text>
+              <Text style={styles.mealPrice}>{`$ ${meal.price}`}</Text>
             </View>
           </View>
           <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
@@ -122,12 +137,12 @@ class Details extends Component {
             {renderMeals}
           </View>
         </ScrollView>
-        {this.state.myOrder.meal[0]
+        {this.state.meal[0]
           ?<View style={styles.buttonBox}>
             <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
               <View style={{ flex: 1}}></View>
               <Text style={styles.buttonText}>下一步</Text>
-              <Text style={styles.buttonPrice}>$ 87</Text>
+              <Text style={styles.buttonPrice}>{`$ ${this.state.total}`}</Text>
             </TouchableOpacity>
            </View>
           :null
