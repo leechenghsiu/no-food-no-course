@@ -19,6 +19,9 @@ class OrderScreen extends React.Component {
   render() {
     if(this.props.navigation.state.params) {
       const meal = this.props.navigation.state.params.meal;
+      const hour = this.props.navigation.state.params.hour;
+      const minute = this.props.navigation.state.params.minute;
+      const note = this.props.navigation.state.params.note;
       
       const renderMeal = meal.map(meal=>(
         <Text key={meal.name}>{`${meal.name} ${meal.price} ${meal.count}`}</Text>
@@ -27,6 +30,8 @@ class OrderScreen extends React.Component {
       return (
         <View style={{flex: 1}}>
           {renderMeal}
+          <Text>{`${hour} ${minute}`}</Text>
+          <Text>{`${note}`}</Text>
         </View>
       )
     } else {

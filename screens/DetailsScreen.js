@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { ScrollView, View, Text, Platform, StatusBar, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Tile } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SafeAreaView } from 'react-navigation';
 
 class Details extends Component {
   static navigationOptions = ({navigation}) => {
@@ -25,7 +26,7 @@ class Details extends Component {
   }
 
   handleSubmit = () => {
-    this.props.navigation.navigate('Confirm',{ meal: this.state.meal })
+    this.props.navigation.navigate('Confirm',{ meal: this.state.meal, name: this.props.navigation.state.params.name, total: this.state.total })
   }
 
   handleCount = () => {
@@ -107,7 +108,7 @@ class Details extends Component {
             </View>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.mealName}>{meal.name}</Text>
-              <Text style={styles.mealPrice}>{`$ ${meal.price}`}</Text>
+              <Text style={styles.mealPrice}>{`NT$ ${meal.price}`}</Text>
             </View>
           </View>
           <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
@@ -123,32 +124,32 @@ class Details extends Component {
     })
 
     return (
-      <View style={{ flex: 1 }}>
-        <ScrollView style={{ backgroundColor: 'rgb(249,249,249)' }}>
-          <StatusBar backgroundColor="transparent" barStyle="light-content" />
-          <Tile
-            imageSrc={{ uri: image }}
-            featured
-          />
-          <View style={ styles.container }>
-            <Text style={styles.name}>{name}</Text>
-            <Text style={styles.description}>{description}</Text>
-            <Text style={[styles.name, {marginBottom: 20}]}>餐點</Text>
-            {renderMeals}
-          </View>
-        </ScrollView>
-        {this.state.meal[0]
-          ?<View style={styles.buttonBox}>
-            <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
-              <View style={{ flex: 1}}></View>
-              <Text style={styles.buttonText}>下一步</Text>
-              <Text style={styles.buttonPrice}>{`$ ${this.state.total}`}</Text>
-            </TouchableOpacity>
-           </View>
-          :null
-        }
-        
-      </View>
+      <SafeAreaView style={{flex: 1, backgroundColor: this.state.meal[0]?'rgb(141,216,227)':'rgb(249,249,249)'}} forceInset={{ top: 'never' }}>
+        <View style={{ flex: 1 }}>
+          <ScrollView style={{ backgroundColor: 'rgb(249,249,249)' }}>
+            <StatusBar backgroundColor="transparent" barStyle="light-content" />
+            <Tile
+              imageSrc={{ uri: image }}
+              featured
+            />
+            <View style={ styles.container }>
+              <Text style={styles.name}>{name}</Text>
+              <Text style={styles.description}>{description}</Text>
+              <Text style={[styles.name, {marginBottom: 20}]}>餐點</Text>
+              {renderMeals}
+            </View>
+          </ScrollView>
+          {this.state.meal[0]
+            ?<View style={styles.buttonBox}>
+              <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
+                <View style={{ flex: 1}}></View>
+                <Text style={styles.buttonText}>下一步</Text>
+                <Text style={styles.buttonPrice}>{`$ ${this.state.total}`}</Text>
+              </TouchableOpacity>
+            </View>
+            :null}
+        </View>
+      </SafeAreaView>
     );
   };
 }
@@ -156,7 +157,8 @@ class Details extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 30
+    padding: 30,
+    paddingBottom: 60
   },
   name: {
     marginLeft: 10,
@@ -213,9 +215,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     position: 'absolute',
-    bottom: 0,
-    marginBottom: 34,
-
+    bottom: 0
   },
   button: {
     flexDirection: 'row',
