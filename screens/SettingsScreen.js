@@ -1,14 +1,46 @@
 import React from 'react';
-import { ExpoConfigView } from '@expo/samples';
+import { ScrollView, Platform } from 'react-native';
+import { Tile, ListItem } from 'react-native-elements';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default class SettingsScreen extends React.Component {
-  static navigationOptions = {
-    title: 'app.json',
+import me from '../json/me.json';
+
+class SettingsScreen extends React.Component {
+  static navigationOptions = ({navigation}) => {
+    const qrscanner = <Ionicons
+      name={Platform.OS === "ios" ? "ios-qr-scanner" : "md-qr-scanner"}
+      color="#007AFF"
+      size={25}
+      style={{padding: 10 }}
+      onPress={() => navigation.navigate('Scanner')}
+    />
+    return {
+      headerRight: qrscanner
+    }
   };
 
+  state = { me: [] };
+
+  componentWillMount() {
+    this.setState({ me });
+  }
+
   render() {
-    /* Go ahead and delete ExpoConfigView and replace it with your
-     * content, we just wanted to give you a quick view of your config */
-    return <ExpoConfigView />;
+    return (
+      <ScrollView>
+        <Tile
+          featured
+          title={`${this.state.me.name.first}`}
+          caption={`$${this.state.me.balance}`}
+        />
+          <ListItem
+          title="ID"
+          rightTitle={this.state.me.id}
+          hideChevron
+          />
+      </ScrollView>
+    );
   }
 }
+
+export default SettingsScreen;
