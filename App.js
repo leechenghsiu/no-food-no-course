@@ -1,12 +1,24 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
+// import * as firebase from 'firebase';
 import AppNavigator from './navigation/AppNavigator';
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+
+  componentWillMount() {
+    firebase.initializeApp({
+      apiKey: "AIzaSyB6m0ceoBXtvxTE9CICS7dkc9lK123u6n4",
+      authDomain: "no-food-no-course.firebaseapp.com",
+      databaseURL: "https://no-food-no-course.firebaseio.com",
+      projectId: "no-food-no-course",
+      storageBucket: "no-food-no-course.appspot.com",
+      messagingSenderId: "1019235064309"
+    });
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
