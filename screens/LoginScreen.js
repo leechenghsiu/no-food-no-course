@@ -36,18 +36,6 @@ class LoginScreen extends Component {
       this.setState({email: '', password: '', loading: false});
       this.props.navigation.navigate('Main');
     } catch (err) {
-      // this.onCreateUser();
-      return null;
-    }
-  }
-
-  onCreateUser = async () => {
-    const { email, password } = this.state;
-    try {
-      await firebase.auth().createUserWithEmailAndPassword(email, password);
-      this.setState({email: '', password: '', loading: false});
-      this.props.navigation.navigate('Main');
-    } catch (err) {
       this.setState({
         email: '',
         password: '',
@@ -88,30 +76,28 @@ class LoginScreen extends Component {
 
   render() {
     return (
-      <View>
-        <View style={styles.formStyle}>
-          <InputBox
-            label='Email'
-            errorMessage={this.state.error}
-            placeholder='user@email.com'
-            autoCorrect={false}
-            autoCapitalize='none'
-            keyboardType='email-address'
-            value={this.state.email}
-            onChangeText={email => this.setState({ email })}
-          />
-          <InputBox
-            label='Password'
-            errorMessage={this.state.error}
-            secureTextEntry
-            autoCorrect={false}
-            autoCapitalize='none'
-            placeholder='password'
-            value={this.state.password}
-            onChangeText={password => this.setState({ password })}
-          />
-          {this.renderButton()}
-        </View>
+      <View style={styles.formStyle}>
+        <InputBox
+          label='Email'
+          errorMessage={this.state.error}
+          placeholder='請輸入學校信箱'
+          autoCorrect={false}
+          autoCapitalize='none'
+          keyboardType='email-address'
+          value={this.state.email}
+          onChangeText={email => this.setState({ email })}
+        />
+        <InputBox
+          label='Password'
+          errorMessage={this.state.error}
+          secureTextEntry
+          autoCorrect={false}
+          autoCapitalize='none'
+          placeholder='請輸入密碼'
+          value={this.state.password}
+          onChangeText={password => this.setState({ password })}
+        />
+        {this.renderButton()}
       </View>
     );
   }
