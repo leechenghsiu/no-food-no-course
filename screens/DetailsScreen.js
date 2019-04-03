@@ -103,8 +103,8 @@ class Details extends Component {
       return(
         <View style={styles.meal} key={meal.name}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={[{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: 8, height: 16 , borderRadius: 2},this.state.meal.find(x => x.name === meal.name)?{display: 'flex'}:{backgroundColor: 'transparent'}]}>
-              <Text style={styles.mealCount}>{this.state.meal.find(x => x.name === meal.name)?this.state.meal.find(x => x.name === meal.name).count:''}</Text>
+            <View style={[{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?8:10, height: 16 , borderRadius: 2},this.state.meal.find(x => x.name === meal.name)?{display: 'flex'}:{backgroundColor: 'transparent'}]}>
+              <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{this.state.meal.find(x => x.name === meal.name)?this.state.meal.find(x => x.name === meal.name).count:''}</Text>
             </View>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.mealName}>{meal.name}</Text>
@@ -113,10 +113,10 @@ class Details extends Component {
           </View>
           <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
             <TouchableOpacity style={styles.addButton} onPress={()=>handleDecreaseMeal(meal)}>
-              <Text style={styles.addButtonText}>−</Text>
+              <Text style={[styles.addButtonText, Platform.OS === "ios" ?{lineHeight: 30}:{lineHeight: 40}]}>−</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.addButton} onPress={()=>handleIncreaseMeal(meal)}>
-              <Text style={styles.addButtonText}>+</Text>
+              <Text style={[styles.addButtonText, Platform.OS === "ios" ?{lineHeight: 30}:{lineHeight: 40}]}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     fontSize: 30,
-    lineHeight: 30,
     textAlign: 'center',
     color: 'rgb(151,151,151)',
     fontWeight: '300'
@@ -226,14 +225,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     textAlign: 'center',
-    padding: 17,
+    padding: 15,
     color: 'white'
   },
   buttonPrice: {
     flex: 1,
     fontSize: 16,
     textAlign: 'center',
-    paddingVertical: 17,
+    paddingTop: 15,
     color: 'white'
   }
 });

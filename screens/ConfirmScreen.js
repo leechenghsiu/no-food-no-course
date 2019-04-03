@@ -1,15 +1,14 @@
 import React from 'react';
-import { View, Platform, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Platform, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Image, DatePickerIOS, TimePickerAndroid } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
-import TimePicker from '../components/TimePicker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 class ConfirmScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     const back = <Ionicons
       name={Platform.OS === "ios" ? "ios-arrow-back" : "md-arrow-back"}
-      color="#007AFF"
+      color="#000"
       size={30}
       style={{padding: 10 }}
       onPress={() => navigation.goBack()}
@@ -24,27 +23,51 @@ class ConfirmScreen extends React.Component {
     super(props);
     this.state = {
       showIndicator: false,
-      selectedHours: 12,
-      selectedMinutes: 0,
+      chosenTime: new Date(),
+      hour: 12,
+      minute: `00`,
       note: ''
+    }
+    this.setTime = this.setTime.bind(this);
+  }
+
+  setTime(newTime) {
+    const h = (newTime.getHours() < 10) ? `0${newTime.getHours()}` : newTime.getHours();
+    const m = (newTime.getMinutes() < 10) ? `0${newTime.getMinutes()}` : newTime.getMinutes();
+    this.setState({chosenTime: newTime, hour: h, minute: m});
+  }
+
+  setTimeAndroid = async () => {
+    try {
+      const {action, hour, minute} = await TimePickerAndroid.open({
+        hour: 12,
+        minute: 0,
+        is24Hour: false
+      });
+      if (action !== TimePickerAndroid.dismissedAction) {
+        const h = (hour < 10) ? `0${hour}` : hour;
+        const m = (minute < 10) ? `0${minute}` : minute;
+        this.setState({hour: h, minute: m});
+      }
+    } catch ({code, message}) {
+      console.warn('Cannot open time picker', message);
     }
   }
 
   handleSubmit = () => {
     this.setState({ showIndicator: true });
-    setTimeout(() => this.props.navigation.navigate('Order',{ meal: this.props.navigation.state.params.meal, hour: this.state.selectedHours, minute: this.state.selectedMinutes, note: this.state.note }), 1000)
+    setTimeout(() => this.props.navigation.navigate('Order',{ meal: this.props.navigation.state.params.meal, hour: this.state.hour, minute: this.state.minute, note: this.state.note }), 1000)
   }
 
   render() {
     const meal = this.props.navigation.state.params.meal;
     const name = this.props.navigation.state.params.name;
     const total = this.props.navigation.state.params.total;
-    const { selectedHours, selectedMinutes } = this.state;
     
     const renderMeal = meal.map(meal=>(
       <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
-        <View style={{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', height: 16 , borderRadius: 2 }}>
-          <Text style={styles.mealCount}>{meal.count}</Text>
+        <View style={{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?0:2, height: 16 , borderRadius: 2 }}>
+          <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.count}</Text>
         </View>
         <View style={{ flex: 5 }}>
           <Text style={styles.mealName}>{meal.name}</Text>
@@ -67,7 +90,7 @@ class ConfirmScreen extends React.Component {
           <View style={{ flex: 1 }}>
             <ScrollView style={{ backgroundColor: 'white' }}>
               <StatusBar backgroundColor="transparent" barStyle="dark-content" />
-              <KeyboardAwareScrollView>
+              <KeyboardAwareScrollView enableOnAndroid={true} enableAutomaticScroll={(Platform.OS === 'ios')}>
                 <View style={styles.container}>
                   <View style={{flex: 1, flexDirection: 'row'}}>
                     <View style={{flex: 1}}></View>
@@ -87,13 +110,18 @@ class ConfirmScreen extends React.Component {
                   <View style={styles.box}>
                     <Text style={styles.boxTitle}>取餐時間</Text>
                     <View style={styles.timePicker}>
-                      <TimePicker
-                        selectedHours={selectedHours}
-                        selectedMinutes={selectedMinutes}
-                        onChange={(hours, minutes) =>
-                          this.setState({ selectedHours: hours, selectedMinutes: minutes })
-                        }
+                      {Platform.OS === "ios" 
+                      ?<DatePickerIOS
+                        style={{marginTop: -60}}
+                        mode="time"
+                        date={this.state.chosenTime}
+                        onDateChange={this.setTime}
                       />
+                      :<TouchableOpacity style={styles.timePickerAndroid} onPress={()=>this.setTimeAndroid()} >
+                        <Text style={styles.timePickerAndroidText}>{`${this.state.hour} : ${this.state.minute}`}</Text>
+                        <Text style={[styles.timePickerAndroidText, {fontSize: 24}]}>EDIT</Text>
+                      </TouchableOpacity>
+                      }
                     </View>
                   </View>
                   <View style={styles.box}>
@@ -185,8 +213,20 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   timePicker: {
-    height: 120,
+    height: 100,
     overflow: 'hidden'
+  },
+  timePickerAndroid: {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingVertical: 50
+  },
+  timePickerAndroidText: {
+    fontSize: 30,
+    color: 'rgb(64,64,64)'
   },
   addNote: {
     backgroundColor: 'white',
@@ -214,7 +254,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     textAlign: 'center',
-    padding: 17,
+    padding: 15,
     color: 'white'
   }
 })

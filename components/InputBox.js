@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, View, Text, Platform } from 'react-native';
+import { View, Platform } from 'react-native';
 import { Input } from 'react-native-elements';
 
 const InputBox = ({ label,
@@ -9,9 +9,10 @@ const InputBox = ({ label,
    secureTextEntry,
    autoCorrect,
    autoCapitalize,
-   keyboardType}) => {
+   keyboardType,
+   errorMessage}) => {
 
-   const { inputStyle, containerStyle } = styles;
+   const { inputStyle, inputContainerStyle, containerStyle } = styles;
 
    if (Platform.OS === 'ios') {
       return (
@@ -23,8 +24,11 @@ const InputBox = ({ label,
             secureTextEntry={secureTextEntry}
             placeholder={placeholder}
             autoCorrect={false}
+            inputStyle={inputStyle}
+            inputContainerStyle={inputContainerStyle}
             value={value}
             onChangeText={onChangeText}
+            errorMessage={errorMessage}
          />
       );
    }
@@ -38,9 +42,11 @@ const InputBox = ({ label,
             secureTextEntry={secureTextEntry}
             placeholder={placeholder}
             autoCorrect={false}
-            style={inputStyle}
+            inputStyle={inputStyle}
+            inputContainerStyle={inputContainerStyle}
             value={value}
             onChangeText={onChangeText}
+            errorMessage={errorMessage}
          />
       </View>
    );
@@ -48,22 +54,26 @@ const InputBox = ({ label,
 
 const styles = {
    inputStyle: {
-      color: '#000',
-      paddingRight: 5,
-      paddingLeft: 5,
+      color: 'teal',
       fontSize: 18,
       lineHeight: 23,
+   },
+   inputContainerStyle: {
+      paddingVertical: 20,
+      paddingHorizontal: 10,
       height: 40,
       flex: 1,
+      borderWidth: 1,
+      borderRadius: 5
    },
    containerStyle: {
-      borderBottomWidth: 1,
+      borderWidth: 1,
+      borderRadius: 5,
       padding: 5,
       justifyContent: 'flex-start',
       flexDirection: 'row',
-      borderColor: '#ddd',
+      borderColor: '#ddd'
    }
 };
 
-// export { Input };
 export default InputBox;

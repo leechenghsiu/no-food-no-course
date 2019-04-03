@@ -60,7 +60,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     shadowOffset: { width: 2, height: 5 },
     shadowColor: 'rgba(0, 0, 0, .12)',
-    shadowOpacity: 0.5
+    shadowOpacity: 0.5,
+    elevation: 1
   },
   name: {
     fontSize: 16,
