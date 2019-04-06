@@ -1,13 +1,31 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { AppLoading, Asset, Font, Icon } from 'expo';
+import { AppLoading, Asset, Font, Icon, ScreenOrientation } from 'expo';
 import * as firebase from 'firebase';
 import AppNavigator from './navigation/AppNavigator';
 
+// //mongodb
+// const MongoClient = require('mongodb').MongoClient;
+
+// // replace the uri string with your connection string.
+// const uri = "mongodb+srv://test:1234@cluster0-kmy2i.mongodb.net/test?retryWrites=true"
+// MongoClient.connect(uri, function(err, client) {
+//   if(err) {
+//         console.log('Error occurred while connecting to MongoDB Atlas...\n',err);
+//   }
+//   console.log('Connected...');
+//   const collection = client.db("test").collection("devices");
+//   // perform actions on the collection object
+//   client.close();
+// });
+
 export default class App extends React.Component {
-  state = {
-    isLoadingComplete: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoadingComplete: false
+    }
+  }
 
   componentWillMount() {
     firebase.initializeApp({
@@ -44,6 +62,7 @@ export default class App extends React.Component {
       Asset.loadAsync([
         require('./assets/images/robot-dev.png'),
         require('./assets/images/robot-prod.png'),
+        require('./assets/images/logo-full.png')
       ]),
       Font.loadAsync({
         // This is the font that we are using for our tab bar

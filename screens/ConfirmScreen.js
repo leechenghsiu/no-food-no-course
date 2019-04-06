@@ -90,7 +90,7 @@ class ConfirmScreen extends React.Component {
           <View style={{ flex: 1 }}>
             <ScrollView style={{ backgroundColor: 'white' }}>
               <StatusBar backgroundColor="transparent" barStyle="dark-content" />
-              <KeyboardAwareScrollView enableOnAndroid={true} enableAutomaticScroll={(Platform.OS === 'ios')}>
+              <KeyboardAwareScrollView>
                 <View style={styles.container}>
                   <View style={{flex: 1, flexDirection: 'row'}}>
                     <View style={{flex: 1}}></View>

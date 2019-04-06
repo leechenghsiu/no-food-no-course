@@ -14,8 +14,16 @@ class SettingsScreen extends React.Component {
       style={{padding: 10 }}
       onPress={() => navigation.navigate('Scanner')}
     />
+    const power = <Ionicons
+      name={Platform.OS === "ios" ? "ios-power" : "md-power"}
+      color="#007AFF"
+      size={25}
+      style={{padding: 10 }}
+      onPress={() => navigation.navigate('Auth')}
+    />
     return {
-      headerRight: qrscanner
+      headerRight: qrscanner,
+      headerLeft: power
     }
   };
 

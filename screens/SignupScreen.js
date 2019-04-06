@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { View, Platform, Text, ActivityIndicator } from 'react-native';
+import { View, Platform, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import * as firebase from 'firebase';
+import { SafeAreaView } from 'react-navigation';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import InputBox from '../components/InputBox';
 
@@ -59,14 +61,20 @@ class SignupScreen extends React.Component {
     return (
       <View style={styles.formStyle}>
         <Button
+          title='立即註冊'
+          raised={true}
+          titleStyle={styles.signupButtonTitle}
+          buttonStyle={styles.signupButton}
+          containerStyle={styles.signupButtonBox}
           onPress={this.onCreateUser}
-          type='clear'
-          title="註冊"
         />
         <Button
-          onPress={() => this.props.navigation.goBack()}
-          type='clear'
           title="取消"
+          raised={true}
+          titleStyle={styles.cancelButtonTitle}
+          buttonStyle={styles.cancelButton}
+          containerStyle={styles.cancelButtonBox}
+          onPress={() => this.props.navigation.goBack()}
         />
       </View>
     );
@@ -74,62 +82,106 @@ class SignupScreen extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <View style={{marginTop: 50}}>
-          <Text style={{fontSize: 30}}>註冊</Text>
-          <InputBox
-            label='Email'
-            errorMessage={this.state.error}
-            placeholder='user@email.com'
-            autoCorrect={false}
-            autoCapitalize='none'
-            keyboardType='email-address'
-            value={this.state.email}
-            onChangeText={email => this.setState({ email })}
-          />
-          <InputBox
-            label='Password'
-            errorMessage={this.state.error}
-            secureTextEntry
-            autoCorrect={false}
-            autoCapitalize='none'
-            placeholder='password'
-            value={this.state.password}
-            onChangeText={password => this.setState({ password })}
-          />
-          <InputBox
-            label='Username'
-            autoCorrect={false}
-            placeholder='John Doe'
-            value={this.state.username}
-            onChangeText={username => this.setState({ username })}
-          />
-          <InputBox
-            label='Phone'
-            autoCorrect={false}
-            placeholder='555-555-5555'
-            value={this.state.phone}
-            onChangeText={phone => this.setState({ phone })}
-          />
-          <InputBox
-            label='學號'
-            autoCorrect={false}
-            placeholder='110419004'
-            value={this.state.id}
-            onChangeText={id => this.setState({ id })}
-          />
+      <SafeAreaView style={{flex: 1, backgroundColor: 'rgb(141,216,227)'}} forceInset={{ top: 'always' }}>  
+        <View style={styles.container}>
+          <KeyboardAwareScrollView style={{paddingHorizontal: 40}}>
+            <Text style={styles.title}>註冊</Text>
+            <InputBox
+              label='學校信箱'
+              errorMessage={this.state.error}
+              placeholder='s110419040@stu.ntue.edu.tw'
+              autoCorrect={false}
+              autoCapitalize='none'
+              keyboardType='email-address'
+              value={this.state.email}
+              onChangeText={email => this.setState({ email })}
+              leftIcon="mail"
+            />
+            <InputBox
+              label='密碼'
+              errorMessage={this.state.error}
+              secureTextEntry
+              autoCorrect={false}
+              autoCapitalize='none'
+              placeholder='password'
+              value={this.state.password}
+              onChangeText={password => this.setState({ password })}
+              leftIcon="lock"
+            />
+            <InputBox
+              label='使用者名稱'
+              errorMessage={this.state.error}
+              autoCorrect={false}
+              placeholder='曾阿醜'
+              value={this.state.username}
+              onChangeText={username => this.setState({ username })}
+              leftIcon="person"
+            />
+            <InputBox
+              label='手機'
+              errorMessage={this.state.error}
+              autoCorrect={false}
+              placeholder='0952-114-289'
+              value={this.state.phone}
+              onChangeText={phone => this.setState({ phone })}
+              leftIcon="phone-portrait"
+            />
+            <InputBox
+              label='學號'
+              errorMessage={this.state.error}
+              autoCorrect={false}
+              placeholder='110419004'
+              value={this.state.id}
+              onChangeText={id => this.setState({ id })}
+              leftIcon="school"
+            />
+          {this.renderButton()}
+          </KeyboardAwareScrollView>
         </View>
-        {this.renderButton()}
-      </View>
+      </SafeAreaView>
     );
   }
 }
 
-const styles = {
-  formStyle: {
-    marginTop: 150,
-    flexDirection: 'row'
-  }
-};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'rgb(141,216,227)',
+  },
+  title: {
+    fontSize: 48,
+    color: 'white',
+    fontWeight: '500',
+    paddingVertical: 30,
+    paddingHorizontal: 10
+  },
+  signupButtonTitle: {
+    color: 'rgb(141,216,227)',
+    fontWeight: '400'
+  },
+  signupButton: {
+    backgroundColor: 'rgb(255,255,255)',
+    borderRadius: 5
+  },
+  signupButtonBox: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    paddingVertical: 3
+  },
+  cancelButtonTitle: {
+    color: '#f9f9f9',
+    fontWeight: '400'
+  },
+  cancelButton: {
+    backgroundColor: '#b0e3ea',
+    borderRadius: 5,
+    paddingVertical: 10
+  },
+  cancelButtonBox: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    // 
+  },
+})
 
 export default SignupScreen;
