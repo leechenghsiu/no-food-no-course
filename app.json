@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "no-food-no-course",
-    "description": "使用「無食無課」讓你「無時無刻」呷飽飽！",
+    "description": "（開發中）使用「無食無課」讓你「無時無刻」呷飽飽！",
     "slug": "no-food-no-course",
     "privacy": "public",
     "sdkVersion": "31.0.0",
@@ -14,8 +14,8 @@
     "icon": "./assets/images/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "resizeMode": "cover",
+      "backgroundColor": "#8dd8e3"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

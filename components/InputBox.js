@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Platform } from 'react-native';
 import { Input } from 'react-native-elements';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const InputBox = ({ label,
    value,
@@ -10,9 +11,18 @@ const InputBox = ({ label,
    autoCorrect,
    autoCapitalize,
    keyboardType,
-   errorMessage}) => {
+   errorMessage,
+   leftIcon}) => {
 
-   const { inputStyle, inputContainerStyle, containerStyle } = styles;
+   const { inputStyle, inputContainerStyle, containerStyle, labelStyle } = styles;
+   const icon = 
+      <View style={{justifyContent: 'center', marginLeft: -15, marginRight: 8, width: 30, alignItems: 'center'}}>
+         <Ionicons
+            name={Platform.OS === "ios" ? `ios-${leftIcon}` : `md-${leftIcon}`}
+            color="#FFFFFF"
+            size={30}
+         />
+      </View>
 
    if (Platform.OS === 'ios') {
       return (
@@ -23,12 +33,15 @@ const InputBox = ({ label,
             keyboardType={keyboardType}
             secureTextEntry={secureTextEntry}
             placeholder={placeholder}
+            placeholderTextColor="#71aab6"
             autoCorrect={false}
             inputStyle={inputStyle}
             inputContainerStyle={inputContainerStyle}
             value={value}
             onChangeText={onChangeText}
             errorMessage={errorMessage}
+            leftIcon={icon}
+            labelStyle={labelStyle}
          />
       );
    }
@@ -36,17 +49,21 @@ const InputBox = ({ label,
    return (
       <View style={containerStyle}>
          <Input
+            label={label}
             autoCapitalize={autoCapitalize}
             autoCorrect={autoCorrect}
             keyboardType={keyboardType}
             secureTextEntry={secureTextEntry}
             placeholder={placeholder}
+            placeholderTextColor="#71aab6"
             autoCorrect={false}
             inputStyle={inputStyle}
             inputContainerStyle={inputContainerStyle}
             value={value}
             onChangeText={onChangeText}
             errorMessage={errorMessage}
+            leftIcon={icon}
+            labelStyle={labelStyle}
          />
       </View>
    );
@@ -54,25 +71,27 @@ const InputBox = ({ label,
 
 const styles = {
    inputStyle: {
-      color: 'teal',
+      color: 'white',
       fontSize: 18,
-      lineHeight: 23,
+      lineHeight: 23
    },
    inputContainerStyle: {
       paddingVertical: 20,
-      paddingHorizontal: 10,
       height: 40,
       flex: 1,
-      borderWidth: 1,
-      borderRadius: 5
+      borderBottomWidth: 2,
+      borderColor: 'white'
    },
    containerStyle: {
-      borderWidth: 1,
+      borderWidth: 0,
       borderRadius: 5,
       padding: 5,
       justifyContent: 'flex-start',
       flexDirection: 'row',
       borderColor: '#ddd'
+   },
+   labelStyle: {
+      color: 'white'
    }
 };
 
