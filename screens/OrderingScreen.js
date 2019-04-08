@@ -54,7 +54,7 @@ class OrderingScreen extends React.Component {
       )
     } else if (!this.state.meal[0]) {
       return (
-        <View style={{flex: 1, padding: 20}}>
+        <View style={{flex: 1, padding: 20, backgroundColor: 'rgb(249,249,249)'}}>
           <Text>目前沒有訂單</Text>
         </View>
       )

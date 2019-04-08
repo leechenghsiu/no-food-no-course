@@ -104,7 +104,7 @@ class SettingsScreen extends React.Component {
                 <Image source={require('../assets/images/avatar.png')} style={{width: 70, height: 70}}/>
               </View>
             </View>
-            <View style={{flex: 5, justifyContent: 'space-around', height: '100%', paddingVertical: 30 }}>
+            <View style={{flex: 5, justifyContent: 'space-around', height: '100%', paddingVertical: 30, paddingLeft: 20 }}>
               <Text style={styles.text}>{username}</Text>
               <Text style={styles.text}>{`餘額：${balance}`}</Text>
             </View>
