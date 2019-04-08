@@ -3,6 +3,7 @@ import { View, Platform, Text, StatusBar, StyleSheet, ScrollView, ActivityIndica
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import * as firebase from 'firebase';
 
 class ConfirmScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -19,16 +20,32 @@ class ConfirmScreen extends React.Component {
       headerLeft: back
     }
   }
+  
   constructor(props) {
     super(props);
     this.state = {
-      showIndicator: false,
+      saving: false,
       chosenTime: new Date(),
       hour: 12,
       minute: `00`,
       note: ''
     }
     this.setTime = this.setTime.bind(this);
+  }
+
+  state = {
+    balance: ''
+  }
+
+  async componentWillMount() {
+    const { currentUser } = firebase.auth();
+    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    try {
+      let snapshot = await dbUserid.once('value');
+      let balance = snapshot.val().balance;
+
+      this.setState({ balance });
+    } catch (err) { }
   }
 
   setTime(newTime) {
@@ -54,15 +71,44 @@ class ConfirmScreen extends React.Component {
     }
   }
 
-  handleSubmit = () => {
-    this.setState({ showIndicator: true });
-    setTimeout(() => this.props.navigation.navigate('Order',{ meal: this.props.navigation.state.params.meal, hour: this.state.hour, minute: this.state.minute, note: this.state.note }), 1000)
+  handleSubmit = async () => {
+    this.setState({ saving: true });
+
+    const { currentUser } = firebase.auth();
+    const { meal, total } = this.props.navigation.state.params;
+    const { hour, minute, note, balance } = this.state;
+    this.setState({ balance: balance-total });
+    let dbVendorid = firebase.database().ref(`/vendors/28Tv0eOfZkN7nVSrCl8Qzkg8xYv1/order/${currentUser.uid}`);
+    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order/${currentUser.uid}`);
+    let dbBalance = firebase.database().ref(`/users/${currentUser.uid}`);
+    await dbVendorid.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name });
+    await dbUserid.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name });
+    await dbBalance.update({ balance: this.state.balance });
+
+    this.setState({ saving: false }, ()=>this.props.navigation.navigate('Ordering'));
+  }
+
+  renderButton() {
+    if(this.state.saving) {
+      return (
+        <View style={styles.buttonBox}>
+          <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
+            <ActivityIndicator size='small' />
+          </TouchableOpacity>
+        </View>
+      )
+    }
+    return (
+      <View style={styles.buttonBox}>
+        <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
+          <Text style={styles.buttonText}>確認點餐</Text>
+        </TouchableOpacity>
+      </View>
+    )
   }
 
   render() {
-    const meal = this.props.navigation.state.params.meal;
-    const name = this.props.navigation.state.params.name;
-    const total = this.props.navigation.state.params.total;
+    const { meal, name, total } = this.props.navigation.state.params;
     
     const renderMeal = meal.map(meal=>(
       <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
@@ -77,87 +123,75 @@ class ConfirmScreen extends React.Component {
         </View>
       </View>
     ))
-    if(this.state.showIndicator){
-      return (
-        <View style={{flex: 1}}>
-          <StatusBar backgroundColor="transparent" barStyle="dark-content" />
-          <ActivityIndicator size="large" color="gray" style={{flex: 1}} />
-        </View>
-      ) 
-    } else {
-      return (
-        <SafeAreaView style={{flex: 1, backgroundColor: 'rgb(141,216,227)'}} forceInset={{ top: 'never' }}>  
-          <View style={{ flex: 1 }}>
-            <ScrollView style={{ backgroundColor: 'white' }}>
-              <StatusBar backgroundColor="transparent" barStyle="dark-content" />
-              <KeyboardAwareScrollView>
-                <View style={styles.container}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
-                    <View style={{flex: 1}}></View>
-                    <View style={{flex: 1, borderBottomWidth: 1}}>
-                      <Text style={styles.title}>{name}</Text>
-                    </View>
-                    <View style={{flex: 1}}></View>
+    return (
+      <SafeAreaView style={{flex: 1, backgroundColor: 'rgb(141,216,227)'}} forceInset={{ top: 'never' }}>  
+        <View style={{ flex: 1 }}>
+          <ScrollView style={{ backgroundColor: 'white' }}>
+            <StatusBar backgroundColor="transparent" barStyle="dark-content" />
+            <KeyboardAwareScrollView>
+              <View style={styles.container}>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                  <View style={{flex: 1}}></View>
+                  <View style={{flex: 1, borderBottomWidth: 1}}>
+                    <Text style={styles.title}>{name}</Text>
                   </View>
-                  <View style={styles.box}>
-                    <Text style={styles.boxTitle}>預定餐點</Text>
-                    {renderMeal}
-                    <View style={styles.boxTotal}>
-                      <Text style={styles.boxTotalContent}>小計</Text>
-                      <Text style={styles.boxTotalContent}>{`NT$ ${total}`}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.box}>
-                    <Text style={styles.boxTitle}>取餐時間</Text>
-                    <View style={styles.timePicker}>
-                      {Platform.OS === "ios" 
-                      ?<DatePickerIOS
-                        style={{marginTop: -60}}
-                        mode="time"
-                        date={this.state.chosenTime}
-                        onDateChange={this.setTime}
-                      />
-                      :<TouchableOpacity style={styles.timePickerAndroid} onPress={()=>this.setTimeAndroid()} >
-                        <Text style={styles.timePickerAndroidText}>{`${this.state.hour} : ${this.state.minute}`}</Text>
-                        <Text style={[styles.timePickerAndroidText, {fontSize: 24}]}>EDIT</Text>
-                      </TouchableOpacity>
-                      }
-                    </View>
-                  </View>
-                  <View style={styles.box}>
-                    <Text style={styles.boxTitle}>付款</Text>
-                    <View style={styles.boxImage}>
-                      <Image source={require('../assets/images/easy-card.png')} style={{width: 72, height: 42}}/>
-                      <View style={{flexDirection: 'column'}}>
-                        <Text>NT$ 900</Text>
-                        <Text>{`NT$ ${total}`}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.boxTotal}>
-                      <Text style={styles.boxTotalContent}>餘額</Text>
-                      <Text style={styles.boxTotalContent}>NT$ 0</Text>
-                    </View>
-                  </View>
-                  <View style={[styles.box, {borderBottomWidth: 0, height: 200}]}>
-                    <Text style={styles.boxTitle}>備註</Text>
-                    <TextInput
-                      style={styles.addNote}
-                      autoCorrect={false}
-                      onChangeText={note => this.setState({note})}
-                    />
+                  <View style={{flex: 1}}></View>
+                </View>
+                <View style={styles.box}>
+                  <Text style={styles.boxTitle}>預定餐點</Text>
+                  {renderMeal}
+                  <View style={styles.boxTotal}>
+                    <Text style={styles.boxTotalContent}>小計</Text>
+                    <Text style={styles.boxTotalContent}>{`NT$ ${total}`}</Text>
                   </View>
                 </View>
-              </KeyboardAwareScrollView>
-            </ScrollView>      
-            <View style={styles.buttonBox}>
-              <TouchableOpacity style={styles.button} onPress={this.handleSubmit}>
-                <Text style={styles.buttonText}>確認</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </SafeAreaView>
-      )
-    }
+                <View style={styles.box}>
+                  <Text style={styles.boxTitle}>取餐時間</Text>
+                  <View style={styles.timePicker}>
+                    {Platform.OS === "ios" 
+                    ?<DatePickerIOS
+                      style={{marginTop: -60}}
+                      mode="time"
+                      date={this.state.chosenTime}
+                      onDateChange={this.setTime}
+                    />
+                    :<TouchableOpacity style={styles.timePickerAndroid} onPress={()=>this.setTimeAndroid()} >
+                      <Text style={styles.timePickerAndroidText}>{`${this.state.hour} : ${this.state.minute}`}</Text>
+                      <Text style={[styles.timePickerAndroidText, {fontSize: 24}]}>EDIT</Text>
+                    </TouchableOpacity>
+                    }
+                  </View>
+                </View>
+                <View style={styles.box}>
+                  <Text style={styles.boxTitle}>付款</Text>
+                  <View style={styles.boxImage}>
+                    <Image source={require('../assets/images/easy-card.png')} style={{width: 72, height: 42}}/>
+                    <View style={{flexDirection: 'column', alignItems: 'flex-end'}}>
+                      <Text>{`NT$ ${this.state.balance}`}</Text>
+                      <Text>{`NT$ ${total}`}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.boxTotal}>
+                    <Text style={styles.boxTotalContent}>餘額</Text>
+                    <Text style={styles.boxTotalContent}>{`NT$ ${this.state.balance-total}`}</Text>
+                  </View>
+                </View>
+                <View style={[styles.box, {borderBottomWidth: 0, height: 200}]}>
+                  <Text style={styles.boxTitle}>備註</Text>
+                  <TextInput
+                    style={styles.addNote}
+                    autoCorrect={false}
+                    onChangeText={note => this.setState({note})}
+                  />
+                </View>
+              </View>
+            </KeyboardAwareScrollView>
+          </ScrollView>      
+          {this.renderButton()}
+        </View>
+      </SafeAreaView>
+    )
+    
   }
 }
 
@@ -207,7 +241,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgb(151,151,151)',
     flexDirection: 'row',
     paddingVertical: 10,
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    textAlign: 'right'
   },
   boxTotalContent: {
     fontSize: 16
@@ -247,6 +282,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flexDirection: 'row',
+    justifyContent: 'center',
     width: '100%',
     height: '100%'
   },

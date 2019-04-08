@@ -14,23 +14,27 @@ class SignupScreen extends React.Component {
     phone: null,
     username: null,
     id: null,
+    cardId: null,
+    balance: 1000,
     error: ' ',
     loading: false
   };
 
   onCatchUser = async () => {
     const { currentUser } = firebase.auth();
-      const { email, phone, username, id } = this.state;
-      let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
-      try {
-        let snapshot = await dbUserid.once('value');
-        let username = snapshot.val().username;
-        let email = snapshot.val().email;
-        let id = snapshot.val().id;
-        let phone = snapshot.val().phone;
-        this.setState({ username, email, id, phone });
-      } catch (err) { }
-    await dbUserid.set({ email, phone, username, id });
+    const { email, phone, username, id, cardId, balance } = this.state;
+    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    try {
+      let snapshot = await dbUserid.once('value');
+      let username = snapshot.val().username;
+      let email = snapshot.val().email;
+      let id = snapshot.val().id;
+      let phone = snapshot.val().phone;
+      let cardId = snapshot.val().cardId;
+      let balance = snapshot.val().balance;
+      this.setState({ username, email, id, phone, cardId, balance });
+    } catch (err) { }
+    await dbUserid.set({ email, phone, username, id, cardId, balance });
   }
 
   onCreateUser = async () => {
@@ -82,7 +86,7 @@ class SignupScreen extends React.Component {
 
   render() {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: 'rgb(141,216,227)'}} forceInset={{ top: 'always' }}>  
+      <SafeAreaView style={{flex: 1, backgroundColor: 'rgb(141,216,227)'}} forceInset={{ top: 'always' }}>
         <View style={styles.container}>
           <KeyboardAwareScrollView style={{paddingHorizontal: 40}}>
             <Text style={styles.title}>註冊</Text>
@@ -121,7 +125,7 @@ class SignupScreen extends React.Component {
               label='手機'
               errorMessage={this.state.error}
               autoCorrect={false}
-              placeholder='0952-114-289'
+              placeholder='0952114289'
               value={this.state.phone}
               onChangeText={phone => this.setState({ phone })}
               leftIcon="phone-portrait"
@@ -134,6 +138,15 @@ class SignupScreen extends React.Component {
               value={this.state.id}
               onChangeText={id => this.setState({ id })}
               leftIcon="school"
+            />
+            <InputBox
+              label='悠遊卡號碼'
+              errorMessage={this.state.error}
+              autoCorrect={false}
+              placeholder='1234567890'
+              value={this.state.cardId}
+              onChangeText={cardId => this.setState({ cardId })}
+              leftIcon="card"
             />
           {this.renderButton()}
           </KeyboardAwareScrollView>
@@ -180,7 +193,7 @@ const styles = StyleSheet.create({
   cancelButtonBox: {
     marginHorizontal: 10,
     marginVertical: 10,
-    // 
+    //
   },
 })
 
