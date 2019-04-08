@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Platform, StyleSheet, Text } from 'react-native';
+import { View, Platform, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import { BarCodeScanner, Permissions } from 'expo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as firebase from 'firebase';
 
 class ScannerScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -23,12 +24,12 @@ class ScannerScreen extends React.Component {
 
   state = {
     hasCameraPermission: null,
-    data: {
-      name: '無',
-      balance: 1000
-    }
+    saving: false,
+    username: '',
+    balance: '',
+    uid: ''
   }
-
+  
   async componentDidMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
@@ -42,6 +43,13 @@ class ScannerScreen extends React.Component {
     }
     if (hasCameraPermission === false) {
       return <Text>No access to camera</Text>;
+    }
+    if (this.state.saving) {
+      return (
+        <View style={{ flex: 1 }}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
     }
     return (
       <View style={{ flex: 1 }}>
@@ -61,20 +69,25 @@ class ScannerScreen extends React.Component {
     );
   }
 
-  handleBarCodeScanned = ({ type, data }) => {
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    this.props.navigation.navigate('Qrcode',{name: this.state.data.name, balance: this.state.data.balance});
-
-    let name = JSON.parse(data).name;
-    let balance = JSON.parse(data).balance - 200;
-
-    this.setState({
-      data: {
-        name,
-        balance
-      } 
+  handleBarCodeScanned = async ({ data }) => {
+    await this.setState({
+      username: JSON.parse(data).name,
+      balance: JSON.parse(data).balance - 200,
+      uid: JSON.parse(data).uid
     })
-    console.log(this.state.data);
+    // 掃描後扣款
+    this.handleBalance();
+  }
+
+  handleBalance = async () => {
+    this.setState({ saving: true });
+
+    const { balance, uid } = this.state;
+    let dbUserid = await firebase.database().ref(`/users/${uid}`);
+    await dbUserid.update({ balance });
+
+    this.setState({ saving: false });
+    // this.props.navigation.navigate('Qrcode');
   }
 }
 
