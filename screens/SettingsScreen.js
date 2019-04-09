@@ -4,26 +4,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as firebase from 'firebase';
 
 class SettingsScreen extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    const qrscanner = <Ionicons
-      name={Platform.OS === "ios" ? "ios-qr-scanner" : "md-qr-scanner"}
-      color="#007AFF"
-      size={25}
-      style={{padding: 10 }}
-      onPress={() => navigation.navigate('Scanner')}
-    />
-    return {
-      headerRight: qrscanner
-    }
-  };
-
   state = {
     email: null,
     username: null,
     phone: null,
     id: null,
     cardId: null,
-    balance: null
+    balance: ''
   };
 
   // Add Listener To Refresh

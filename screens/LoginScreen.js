@@ -8,20 +8,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import InputBox from '../components/InputBox';
 
 class LoginScreen extends Component {
-  // Super Sign In
-  static navigationOptions = ({navigation}) => {
-    const qrscanner = <Ionicons
-      name={Platform.OS === "ios" ? "ios-qr-scanner" : "md-qr-scanner"}
-      color="#007AFF"
-      size={25}
-      style={{padding: 10 }}
-      onPress={() => navigation.navigate('Main')}
-    />
-    return {
-      headerRight: qrscanner
-    }
-  }
-
   state = {
     email: null,
     password: null,

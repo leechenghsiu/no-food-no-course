@@ -10,7 +10,6 @@ import OrderingScreen from '../screens/OrderingScreen';
 import OrderedScreen from '../screens/OrderedScreen';
 import QrcodeScreen from '../screens/QrcodeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import ScannerScreen from '../screens/ScannerScreen';
 
 // Home Page
 const HomeStack = createStackNavigator({
@@ -149,21 +148,12 @@ OrderStack.navigationOptions = ({ navigation }) => {
 
 // Settings Tab
 const SettingsStack = createStackNavigator({
-    Settings: SettingsScreen,
-    Scanner: ScannerScreen
+    Settings: SettingsScreen
   },
   {
     navigationOptions : ({ navigation }) => {
-      const { routeName } = navigation.state;
-      let titleName;
-      if (routeName === 'Settings') {
-        titleName = `個人資訊`;
-      } else if (routeName === 'Scanner') {
-        titleName = `QR Code`;
-      }     
-
       return {
-        title: titleName
+        title: '個人資訊'
       }
     }
   }
