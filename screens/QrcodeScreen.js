@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Platform } from 'react-native';
+import { View, Text, Platform, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as firebase from 'firebase';
 
@@ -44,6 +44,9 @@ class QrcodeScreen extends React.Component {
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <QrcodeApi />
         <Text>{`${this.state.username} ${this.state.balance}`}</Text>
+        <TouchableOpacity style={{backgroundColor: 'lightgrey', borderRadius: 5, paddingVertical: 20, paddingHorizontal: 40, marginTop: 100 }} onPress={()=>this.props.navigation.navigate('Ordered')}>
+          <Text style={{textAlign: 'center'}}>完成付款</Text>
+        </TouchableOpacity>
       </View>
     )
   }
