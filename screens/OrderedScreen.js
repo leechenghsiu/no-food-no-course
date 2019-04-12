@@ -34,7 +34,7 @@ class OrderedScreen extends React.Component {
       let total = snapshot.val().total;
       let note = snapshot.val().note;
 
-      this.setState({ meal, time, total, note }, ()=>console.log(this.state));
+      this.setState({ meal, time, total, note });
     } catch (err) { }
   }
 

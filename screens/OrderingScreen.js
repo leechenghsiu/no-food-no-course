@@ -5,11 +5,7 @@ import { Button } from 'react-native-elements';
 
 class OrderingScreen extends React.Component {
   state = {
-    meal: [],
-    time: '',
-    total: '',
-    note: '',
-    vendor: '',
+    orders: [],
     loading: false
   }
 
@@ -28,18 +24,16 @@ class OrderingScreen extends React.Component {
     this.setState({ loading: true });
 
     const { currentUser } = firebase.auth();
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order/${currentUser.uid}`);
-    let dbMeal = firebase.database().ref(`/users/${currentUser.uid}/order/${currentUser.uid}/meal`);
+    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order`);
     try {
-      let snapshot = await dbUserid.once('value');
-      let mealSnapshot = await dbMeal.once('value');
-      let meal = mealSnapshot.val();
-      let time = snapshot.val().time;
-      let total = snapshot.val().total;
-      let note = snapshot.val().note;
-      let vendor = snapshot.val().vendor;
+      let mealSnapshot = await dbUserid.once('value');
+      let orders = Object.values(mealSnapshot.val());
+      // 把訂單 ID 加入
+      let ordersWithId = orders.map((item,index)=>Object.assign(item, {orderId: Object.keys(mealSnapshot.val())[index]}));
+      // sort
+      ordersWithId.sort((a, b) => a - b).reverse();
 
-      this.setState({ meal, time, total, note, vendor });
+      this.setState({ orders: ordersWithId },()=>console.log(this.state.orders));
     } catch (err) { }
 
     this.setState({ loading: false });
@@ -52,37 +46,35 @@ class OrderingScreen extends React.Component {
           <ActivityIndicator size='large' />
         </View>
       )
-    } else if (!this.state.meal[0]) {
+    } else if (!this.state.orders) {
       return (
         <View style={{flex: 1, padding: 20, backgroundColor: 'rgb(249,249,249)'}}>
           <Text>目前沒有訂單</Text>
         </View>
       )
-    } else {
-      const { meal, time, note, total, vendor } = this.state;
-      
-      const renderMeal = meal.map(meal=>(
-        <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
-          <View style={{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?0:2, height: 16 , borderRadius: 2 }}>
-            <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.count}</Text>
+    } else {      
+      const renderOrder = this.state.orders.map((order,index)=>{
+        const mealToArray = Object.values(order.meal);
+        const renderMeal = mealToArray.map(meal=>(
+          <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
+            <View style={{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?0:2, height: 16 , borderRadius: 2 }}>
+              <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.count}</Text>
+            </View>
+            <View style={{ flex: 5 }}>
+              <Text style={styles.mealName}>{meal.name}</Text>
+            </View>
+            <View style={{ flex: 2 }}>
+              <Text style={styles.mealPrice}>{`NT$ ${meal.price}`}</Text>
+            </View>
           </View>
-          <View style={{ flex: 5 }}>
-            <Text style={styles.mealName}>{meal.name}</Text>
-          </View>
-          <View style={{ flex: 2 }}>
-            <Text style={styles.mealPrice}>{`NT$ ${meal.price}`}</Text>
-          </View>
-        </View>
-      ))
-
-      return (
-        <ScrollView style={styles.container}>
-          <View style={styles.order}>
+        ))
+        return(
+          <View style={[styles.order, index===0?{marginTop: 20}:null ]} key={order.orderId}>
             <View style={styles.orderTop}>
-              <Text style={styles.vendor}>{`${vendor}`}</Text>
+              <Text style={styles.vendor}>{`${order.vendor}`}</Text>
               <View style={styles.timeBox}>
                 <Text style={[styles.time, {fontSize: 12}]}>取餐時間</Text>
-                <Text style={styles.time}>{`${time}`}</Text>
+                <Text style={styles.time}>{`${order.time}`}</Text>
               </View>
             </View>
 
@@ -91,14 +83,14 @@ class OrderingScreen extends React.Component {
               {renderMeal}
               <View style={styles.total}>
                 <Text style={styles.totalContent}>小計</Text>
-                <Text style={styles.totalContent}>{`NT$ ${total}`}</Text>
+                <Text style={styles.totalContent}>{`NT$ ${order.total}`}</Text>
               </View>
             </View>
 
             <View style={[styles.orderBottom, {}]}>
               <Text style={styles.title}>備註</Text>
               <View style={styles.note}>
-                <Text style={{color: 'rgb(64,64,64)'}}>{`${note}`}</Text>
+                <Text style={{color: 'rgb(64,64,64)'}}>{`${order.note}`}</Text>
               </View>
             </View>
 
@@ -119,16 +111,21 @@ class OrderingScreen extends React.Component {
               />
             </View>
           </View>
-        </ScrollView>
-      )
-    }
+        )
+    })
+
+    return (
+      <ScrollView style={styles.container}>
+        {renderOrder}
+      </ScrollView>
+    )
   }
-}
+}}
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'rgb(249,249,249)',
-    padding: 25
+    paddingHorizontal: 25
   },
   mealCount: {
     color: 'white',
@@ -151,7 +148,8 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(0, 0, 0, .12)',
     shadowOpacity: 0.5,
     elevation: 1,
-    paddingBottom: 10
+    paddingBottom: 10,
+    marginBottom: 20
   },
   orderTop: {
     flexDirection: 'row',
