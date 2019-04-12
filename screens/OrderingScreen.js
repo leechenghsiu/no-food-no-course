@@ -5,7 +5,7 @@ import { Button } from 'react-native-elements';
 
 class OrderingScreen extends React.Component {
   state = {
-    orders: [],
+    orders: null,
     loading: false
   }
 
