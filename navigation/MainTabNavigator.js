@@ -10,6 +10,7 @@ import OrderingScreen from '../screens/OrderingScreen';
 import OrderedScreen from '../screens/OrderedScreen';
 import QrcodeScreen from '../screens/QrcodeScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import PayScreen from '../screens/PayScreen';
 
 // Home Page
 const HomeStack = createStackNavigator({
@@ -50,6 +51,15 @@ HomeStack.navigationOptions = ({ navigation }) => {
 };
 
 // Order Page
+// const OrderingScreenStack = createStackNavigator({
+//     Ordering: OrderingScreen,
+//     Qrcode: QrcodeScreen
+//   },
+//   {
+//     mode: 'modal',
+//     headerMode: 'none'
+// })
+
 const OrderScreenStack = createMaterialTopTabNavigator({
     Ordering: OrderingScreen,
     Ordered: OrderedScreen
@@ -97,27 +107,19 @@ const OrderStack = createStackNavigator({
   {
     navigationOptions : ({ navigation }) => {
       const { routeName } = navigation.state;
-      const barcode = <Ionicons
-        name={Platform.OS === "ios" ? "ios-barcode" : "md-barcode"}
-        color="#007AFF"
-        size={25}
-        style={{padding: 10 }}
-        onPress={() => navigation.navigate('Qrcode')}
-      />
       let titleName, headerRight;
       if (routeName === 'OrderScreenStack') {
         titleName = `訂單`;
-        headerRight = barcode;
       } else if (routeName === 'Qrcode') {
         titleName = `QR Code`;
-        headerRight = '';
       }     
   
       return {
         title: titleName,
         headerRight: headerRight
       }
-    }
+    },
+    mode: 'modal'
   }
 );
 
@@ -147,16 +149,33 @@ OrderStack.navigationOptions = ({ navigation }) => {
 };
 
 // Settings Tab
-const SettingsStack = createStackNavigator({
-    Settings: SettingsScreen
-  },
-  {
-    navigationOptions : ({ navigation }) => {
-      return {
-        title: '個人資訊'
-      }
+const SettingsScreenStack = createStackNavigator({
+  Settings: SettingsScreen
+},
+{
+  navigationOptions : ({ navigation }) => {
+    // const { routeName } = navigation.state;
+    // let titleName;
+    // if (routeName === 'Settings') {
+    //   titleName = `個人資訊`;
+    // } else if (routeName === 'Pay') {
+    //   titleName = `黑白Pay`;
+    // }
+    return {
+      title: '個人資訊'
     }
   }
+}
+);
+
+const SettingsStack = createStackNavigator({
+  SettingsScreen: SettingsScreenStack,
+  Pay: PayScreen
+},
+{
+  mode: 'modal',
+  headerMode: 'none'
+}
 );
 
 SettingsStack.navigationOptions = ({ navigation }) => {

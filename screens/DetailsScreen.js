@@ -26,7 +26,7 @@ class Details extends Component {
   }
 
   handleSubmit = () => {
-    this.props.navigation.navigate('Confirm',{ meal: this.state.meal, name: this.props.navigation.state.params.name, total: this.state.total })
+    this.props.navigation.navigate('Confirm',{ meal: this.state.meal, name: this.props.navigation.state.params.username, total: this.state.total, vendorId: this.props.navigation.state.params.vendorId })
   }
 
   handleCount = () => {
@@ -43,10 +43,11 @@ class Details extends Component {
   }
 
   render() {
-    const { name,
+    const { username,
             image,
             description,
-            meals
+            meals,
+            vendorId
     } = this.props.navigation.state.params;
 
     const renderMeals = meals.map(meal=>{
@@ -133,7 +134,7 @@ class Details extends Component {
               featured
             />
             <View style={ styles.container }>
-              <Text style={styles.name}>{name}</Text>
+              <Text style={styles.name}>{username}</Text>
               <Text style={styles.description}>{description}</Text>
               <Text style={[styles.name, {marginBottom: 20}]}>餐點</Text>
               {renderMeals}
