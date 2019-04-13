@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Platform, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Platform, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as firebase from 'firebase';
+
+const { width } = Dimensions.get('window');
 
 class SettingsScreen extends React.Component {
   state = {
@@ -101,6 +103,28 @@ class SettingsScreen extends React.Component {
               </TouchableOpacity>
             </View>
           </View>
+          <View style={styles.payList}>
+            <TouchableOpacity style={{flex: 1}} onPress={()=>this.props.navigation.navigate('Pay')}>
+              <View style={styles.payListItem}>
+                <Image source={require('../assets/images/qr-code.png')} style={{width: 80, height: 80}}/>
+                <Text style={styles.text}>黑白Pay</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{flex: 1}} onPress={()=>this.props.navigation.navigate('Pay')}>
+              <View style={styles.payListItem}>
+                <Image source={require('../assets/images/qr-code.png')} style={{width: 80, height: 80}}/>
+                <Text style={styles.text}>黑白Pay</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{flex: 1}} onPress={()=>this.props.navigation.navigate('Pay')}>
+              <View style={styles.payListItem}>
+                <Image source={require('../assets/images/qr-code.png')} style={{width: 80, height: 80}}/>
+                <Text style={styles.text}>黑白Pay</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.section}>
           <View style={styles.listItem}>
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
               {school}
@@ -131,7 +155,7 @@ class SettingsScreen extends React.Component {
           
         </View>
         <View style={styles.section}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>this.props.navigation.navigate('Pay')}>
             <View style={styles.listItem}>
               <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                 {helpCircle}
@@ -181,6 +205,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
+  },
+  payList: {
+    height: width/3,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: 'lightgrey'
+  },
+  payListItem: {
+    flex: 1,
+    height: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    borderRightWidth: 1,
+    borderColor: 'lightgrey'
   },
   text: {
     fontSize: 16,

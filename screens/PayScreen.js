@@ -6,7 +6,7 @@ import { Brightness, Permissions } from 'expo';
 
 import QrcodeApi from '../api/QrcodeApi';
 
-class QrcodeScreen extends React.Component {
+class PayScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
     const back = <Ionicons
       name={Platform.OS === "ios" ? "ios-arrow-back" : "md-arrow-back"}
@@ -18,7 +18,9 @@ class QrcodeScreen extends React.Component {
 
     return {
       // headerTransparent: true,
-      headerLeft: null
+      // headerLeft: (
+      //   back
+      // )
     }
   };
 
@@ -49,14 +51,13 @@ class QrcodeScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <QrcodeApi orderId={this.props.navigation.state.params.orderId}/>
+        <QrcodeApi />
         <Text>{`${this.state.username} ${this.state.balance}`}</Text>
         <TouchableOpacity
           style={{backgroundColor: 'lightgrey', borderRadius: 5, paddingVertical: 20, paddingHorizontal: 40, marginTop: 100 }}
           onPress={()=>{
             Brightness.setSystemBrightnessAsync(0.5);
-            // this.props.navigation.navigate('Ordered')
-            this.props.navigation.goBack();
+            this.props.navigation.navigate('Settings')
           }}
         >
           <Text style={{textAlign: 'center'}}>完成付款</Text>
@@ -66,4 +67,4 @@ class QrcodeScreen extends React.Component {
   }
 }
 
-export default QrcodeScreen;
+export default PayScreen;

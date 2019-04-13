@@ -5,8 +5,9 @@ import { Button } from 'react-native-elements';
 
 class OrderingScreen extends React.Component {
   state = {
-    orders: null,
-    loading: false
+    orders: [],
+    loading: false,
+    nothing: false
   }
 
   // Add Listener To Refresh
@@ -34,7 +35,7 @@ class OrderingScreen extends React.Component {
       ordersWithId.sort((a, b) => a - b).reverse();
 
       this.setState({ orders: ordersWithId },()=>console.log(this.state.orders));
-    } catch (err) { }
+    } catch (err) { this.setState({ nothing: true }) }
 
     this.setState({ loading: false });
   }
@@ -46,14 +47,14 @@ class OrderingScreen extends React.Component {
           <ActivityIndicator size='large' />
         </View>
       )
-    } else if (!this.state.orders) {
+    } else if (this.state.nothing) {
       return (
-        <View style={{flex: 1, padding: 20, backgroundColor: 'rgb(249,249,249)'}}>
+        <View style={{flex: 1, padding: 20}}>
           <Text>目前沒有訂單</Text>
         </View>
       )
-    } else {      
-      const renderOrder = this.state.orders.map((order,index)=>{
+    } else {
+      const renderOrder = this.state.orders.filter(order=>order.finish===false).map((order,index)=>{
         const mealToArray = Object.values(order.meal);
         const renderMeal = mealToArray.map(meal=>(
           <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
@@ -96,14 +97,14 @@ class OrderingScreen extends React.Component {
 
             <View style={styles.button}>
               <Button
-                title="加點"
+                title="QR Code"
                 titleStyle={styles.orderButtonTitle}
                 buttonStyle={styles.orderButton}
                 containerStyle={styles.orderButtonBox}
-                onPress={()=>alert("敬請期待")}
+                onPress={()=>this.props.navigation.navigate('Qrcode', { orderId: order.orderId })}
               />
               <Button
-                title="取消"
+                title="取消訂單"
                 titleStyle={styles.orderButtonTitle}
                 buttonStyle={styles.orderButton}
                 containerStyle={styles.orderButtonBox}
@@ -112,14 +113,13 @@ class OrderingScreen extends React.Component {
             </View>
           </View>
         )
-    })
-
-    return (
-      <ScrollView style={styles.container}>
-        {renderOrder}
-      </ScrollView>
-    )
-  }
+      })
+      return (
+        <ScrollView style={styles.container}>
+          {renderOrder}
+        </ScrollView>
+      )
+    }
 }}
 
 const styles = StyleSheet.create({
