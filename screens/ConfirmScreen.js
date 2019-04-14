@@ -30,7 +30,8 @@ class ConfirmScreen extends React.Component {
       minute: `00`,
       note: '',
       balance: '',
-      finish: false
+      finish: false,
+      name: ''
     }
     this.setTime = this.setTime.bind(this);
   }
@@ -41,8 +42,9 @@ class ConfirmScreen extends React.Component {
     try {
       let snapshot = await dbUserid.once('value');
       let balance = snapshot.val().balance;
+      let name = snapshot.val().username;
 
-      this.setState({ balance });
+      this.setState({ balance, name });
     } catch (err) { }
   }
 
@@ -74,15 +76,15 @@ class ConfirmScreen extends React.Component {
 
     const { currentUser } = firebase.auth();
     const { meal, total, vendorId } = this.props.navigation.state.params;
-    const { hour, minute, note, balance, finish } = this.state;
+    const { hour, minute, note, balance, finish, name } = this.state;
     this.setState({ balance: balance-total });
     let dbVendor = firebase.database().ref(`/vendors/${vendorId}/order`).push();
     // let pushKey = dbVendor.key();
     let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order/${dbVendor.key}`);
     let dbBalance = firebase.database().ref(`/users/${currentUser.uid}`);
     // 店家和 User 都要 push 訂單
-    await dbVendor.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish });
-    await dbUserid.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish });
+    await dbVendor.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish, name });
+    await dbUserid.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish, name });
     // User 扣款
     await dbBalance.update({ balance: this.state.balance });
 

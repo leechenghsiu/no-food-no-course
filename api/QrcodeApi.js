@@ -23,16 +23,16 @@ class QrcodeApi extends React.Component {
     if(this.props.orderId){
       const data = `{"name": "${this.state.username}", "uid": "${this.state.uid}", "orderId": "${this.props.orderId}"}`;
       const enc = encodeURI(data);
-      const api = `http://api.qrserver.com/v1/create-qr-code/?data=${enc}&size=300x300&bgcolor=E9E9EF`;
+      const api = `http://api.qrserver.com/v1/create-qr-code/?data=${enc}&size=300x300&bgcolor=FFFFFF`;
 
-      return <Image source={{uri: api}} style={{backgroundColor: 'transparent'}} width={300} height={300} />;
+      return <Image source={{uri: api}} style={{backgroundColor: 'transparent'}} width={170} height={170} />;
 
     } else {
       const data = `{"name": "${this.state.username}", "balance": ${this.state.balance}, "uid": "${this.state.uid}"}`;
       const enc = encodeURI(data);
-      const api = `http://api.qrserver.com/v1/create-qr-code/?data=${enc}&size=300x300&bgcolor=E9E9EF`;
+      const api = `http://api.qrserver.com/v1/create-qr-code/?data=${enc}&size=300x300&bgcolor=FFFFFF`;
 
-      return <Image source={{uri: api}} style={{backgroundColor: 'transparent'}} width={300} height={300} />;
+      return <Image source={{uri: api}} style={{backgroundColor: 'transparent'}} width={170} height={170} />;
 
     }
   }

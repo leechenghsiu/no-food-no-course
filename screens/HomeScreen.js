@@ -12,8 +12,7 @@ class HomeScreen extends React.Component {
 
   state = { 
     loading: false,
-    vendors: [],
-    menu: null
+    vendors: []
   };
 
   async componentWillMount() {
