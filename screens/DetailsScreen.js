@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     color: 'rgb(94,94,94)'
   },
   meal: {
-    height: 70,
+    minHeight: 70,
     width: '100%',
     flexDirection: 'row',
     borderBottomWidth: 1.5,

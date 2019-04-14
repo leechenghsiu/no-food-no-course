@@ -43,13 +43,13 @@ class OrderingScreen extends React.Component {
   render() {
     if (this.state.loading){
       return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgb(249,249,249)'}}>
           <ActivityIndicator size='large' />
         </View>
       )
-    } else if (this.state.nothing) {
+    } else if (this.state.orders.filter(order=>order.finish===false).length<1 || this.state.nothing===true) {
       return (
-        <View style={{flex: 1, padding: 20}}>
+        <View style={{flex: 1, padding: 20, backgroundColor: 'rgb(249,249,249)'}}>
           <Text>目前沒有訂單</Text>
         </View>
       )

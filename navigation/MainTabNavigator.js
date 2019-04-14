@@ -50,16 +50,6 @@ HomeStack.navigationOptions = ({ navigation }) => {
   }
 };
 
-// Order Page
-// const OrderingScreenStack = createStackNavigator({
-//     Ordering: OrderingScreen,
-//     Qrcode: QrcodeScreen
-//   },
-//   {
-//     mode: 'modal',
-//     headerMode: 'none'
-// })
-
 const OrderScreenStack = createMaterialTopTabNavigator({
     Ordering: OrderingScreen,
     Ordered: OrderedScreen
@@ -119,7 +109,16 @@ const OrderStack = createStackNavigator({
         headerRight: headerRight
       }
     },
-    mode: 'modal'
+    mode: 'modal',
+    cardStyle: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      opacity: 1
+    },
+    transitionConfig: () => ({
+      containerStyle: {
+        backgroundColor: 'rgba(0, 0, 0, 0)'
+      }
+    })
   }
 );
 
@@ -154,13 +153,6 @@ const SettingsScreenStack = createStackNavigator({
 },
 {
   navigationOptions : ({ navigation }) => {
-    // const { routeName } = navigation.state;
-    // let titleName;
-    // if (routeName === 'Settings') {
-    //   titleName = `個人資訊`;
-    // } else if (routeName === 'Pay') {
-    //   titleName = `黑白Pay`;
-    // }
     return {
       title: '個人資訊'
     }
@@ -174,7 +166,16 @@ const SettingsStack = createStackNavigator({
 },
 {
   mode: 'modal',
-  headerMode: 'none'
+  headerMode: 'none',
+  cardStyle: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    opacity: 1
+  },
+  transitionConfig: () => ({
+    containerStyle: {
+      backgroundColor: 'rgba(0, 0, 0, 0)'
+    }
+  })
 }
 );
 

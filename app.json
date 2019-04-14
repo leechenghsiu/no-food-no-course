@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "no-food-no-course",
-    "description": "（用戶端）使用「無食無課」讓你「無時無刻」呷飽飽！",
+    "description": "「用戶端」使用「無食無課」讓你「無時無刻」呷飽飽！",
     "slug": "no-food-no-course",
     "privacy": "public",
     "sdkVersion": "31.0.0",

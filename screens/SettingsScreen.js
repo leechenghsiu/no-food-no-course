@@ -95,7 +95,7 @@ class SettingsScreen extends React.Component {
             </View>
             <View style={{flex: 5, justifyContent: 'space-around', height: '100%', paddingVertical: 30, paddingLeft: 20 }}>
               <Text style={styles.text}>{username}</Text>
-              <Text style={styles.text}>{`餘額：${balance}`}</Text>
+              <Text style={styles.text}>{`餘額：$ ${balance}`}</Text>
             </View>
             <View style={{flex: 1}}>
               <TouchableOpacity onPress={()=>alert('還不能修改喔！')}>
@@ -104,22 +104,22 @@ class SettingsScreen extends React.Component {
             </View>
           </View>
           <View style={styles.payList}>
-            <TouchableOpacity style={{flex: 1}} onPress={()=>this.props.navigation.navigate('Pay')}>
+            <TouchableOpacity style={{flex: 1}}>
               <View style={styles.payListItem}>
-                <Image source={require('../assets/images/qr-code.png')} style={{width: 80, height: 80}}/>
-                <Text style={styles.text}>黑白Pay</Text>
+                <Image source={require('../assets/images/card.png')} style={{width: 80, height: 60}}/>
+                <Text style={styles.text}>集點卡</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity style={{flex: 1}} onPress={()=>this.props.navigation.navigate('Pay')}>
               <View style={styles.payListItem}>
-                <Image source={require('../assets/images/qr-code.png')} style={{width: 80, height: 80}}/>
+                <Image source={require('../assets/images/qr-code.png')} style={{width: 60, height: 60}}/>
                 <Text style={styles.text}>黑白Pay</Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={{flex: 1}} onPress={()=>this.props.navigation.navigate('Pay')}>
+            <TouchableOpacity style={{flex: 1}}>
               <View style={styles.payListItem}>
-                <Image source={require('../assets/images/qr-code.png')} style={{width: 80, height: 80}}/>
-                <Text style={styles.text}>黑白Pay</Text>
+                <Image source={require('../assets/images/give-card.png')} style={{width: 80, height: 60}}/>
+                <Text style={styles.text}>送餐券</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -214,11 +214,10 @@ const styles = StyleSheet.create({
   },
   payListItem: {
     flex: 1,
-    height: '100%',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
+    justifyContent: 'space-between',
+    paddingVertical: 20,
     borderRightWidth: 1,
     borderColor: 'lightgrey'
   },
