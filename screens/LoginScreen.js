@@ -26,7 +26,7 @@ class LoginScreen extends Component {
       this.setState({
         email: '',
         password: '',
-        error: 'Syntax Error!',
+        error: 'Error!',
         loading: false
       });
     }

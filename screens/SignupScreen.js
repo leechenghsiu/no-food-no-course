@@ -20,38 +20,26 @@ class SignupScreen extends React.Component {
     loading: false
   };
 
-  onCatchUser = async () => {
-    const { currentUser } = firebase.auth();
-    const { email, phone, username, id, cardId, balance } = this.state;
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
-    try {
-      let snapshot = await dbUserid.once('value');
-      let username = snapshot.val().username;
-      let email = snapshot.val().email;
-      let id = snapshot.val().id;
-      let phone = snapshot.val().phone;
-      let cardId = snapshot.val().cardId;
-      let balance = snapshot.val().balance;
-      this.setState({ username, email, id, phone, cardId, balance });
-    } catch (err) { }
-    await dbUserid.set({ email, phone, username, id, cardId, balance });
-  }
-
   onCreateUser = async () => {
-    const { email, password } = this.state;
+    const { currentUser } = firebase.auth();
+    const { email, password, phone, username, id, cardId, balance } = this.state;
+    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
     this.setState({ error: ' ', loading: true });
     try {
       await firebase.auth().createUserWithEmailAndPassword(email, password);
-      // firebase db start write
-      this.onCatchUser();
-      // firebase db end write
-      this.setState({email: '', password: '', loading: false});
-      this.props.navigation.navigate('Main');
+  
+      this.setState({ username, email, id, phone, cardId, balance });
+      if(username!==null&&id!==null&&phone!==null&&cardId!==null) {
+        await dbUserid.set({ email, phone, username, id, cardId, balance });
+        this.setState({email: '', password: '', loading: false});
+        this.props.navigation.navigate('Main');
+      } else throw err
+
     } catch (err) {
       this.setState({
         email: '',
         password: '',
-        error: err.message,
+        error: 'Error!',
         loading: false
       });
     }

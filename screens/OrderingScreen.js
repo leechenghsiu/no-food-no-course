@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Platform, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Platform, Text, ScrollView, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import * as firebase from 'firebase';
 import { Button } from 'react-native-elements';
 
@@ -38,6 +38,19 @@ class OrderingScreen extends React.Component {
     } catch (err) { this.setState({ nothing: true }) }
 
     this.setState({ loading: false });
+  }
+
+  handleCancel = () => {
+    // Works on both iOS and Android
+    Alert.alert(
+      '確定要刪除訂單？',
+      '',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '確認', onPress: () => console.log('OK Pressed')},
+      ],
+      { cancelable: false }
+    )
   }
 
   render() {
@@ -97,7 +110,7 @@ class OrderingScreen extends React.Component {
 
             <View style={styles.button}>
               <Button
-                title="QR Code"
+                title="我要取餐"
                 titleStyle={styles.orderButtonTitle}
                 buttonStyle={styles.orderButton}
                 containerStyle={styles.orderButtonBox}
@@ -108,7 +121,7 @@ class OrderingScreen extends React.Component {
                 titleStyle={styles.orderButtonTitle}
                 buttonStyle={styles.orderButton}
                 containerStyle={styles.orderButtonBox}
-                onPress={()=>alert("敬請期待")}
+                onPress={()=>this.handleCancel()}
               />
             </View>
           </View>
@@ -208,7 +221,7 @@ const styles = StyleSheet.create({
   },
   orderButton: {
     backgroundColor: 'rgb(234,234,234)',
-    width: 100
+    width: 120
   },
   orderButtonBox: {
     paddingVertical: 3

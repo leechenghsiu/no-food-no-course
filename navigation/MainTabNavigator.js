@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Button } from 'react-native';
+import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -152,7 +152,7 @@ const SettingsScreenStack = createStackNavigator({
   Settings: SettingsScreen
 },
 {
-  navigationOptions : ({ navigation }) => {
+  navigationOptions : () => {
     return {
       title: '個人資訊'
     }
