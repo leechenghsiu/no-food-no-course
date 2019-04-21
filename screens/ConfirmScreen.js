@@ -46,6 +46,7 @@ class ConfirmScreen extends React.Component {
 
       this.setState({ balance, name });
     } catch (err) { }
+    this.setTime(this.state.chosenTime);
   }
 
   setTime(newTime) {
@@ -79,7 +80,6 @@ class ConfirmScreen extends React.Component {
     const { hour, minute, note, balance, finish, name } = this.state;
     this.setState({ balance: balance-total });
     let dbVendor = firebase.database().ref(`/vendors/${vendorId}/order`).push();
-    // let pushKey = dbVendor.key();
     let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order/${dbVendor.key}`);
     let dbBalance = firebase.database().ref(`/users/${currentUser.uid}`);
     // 店家和 User 都要 push 訂單
@@ -171,7 +171,7 @@ class ConfirmScreen extends React.Component {
                     <Image source={require('../assets/images/easy-card.png')} style={{width: 72, height: 42}}/>
                     <View style={{flexDirection: 'column', alignItems: 'flex-end'}}>
                       <Text>{`NT$ ${this.state.balance}`}</Text>
-                      <Text>{`NT$ ${total}`}</Text>
+                      <Text>{`-NT$ ${total}`}</Text>
                     </View>
                   </View>
                   <View style={styles.boxTotal}>

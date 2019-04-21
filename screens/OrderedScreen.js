@@ -5,7 +5,7 @@ import { Button } from 'react-native-elements';
 
 class OrderedScreen extends React.Component {
   state = {
-    orders: null,
+    orders: [],
     loading: false,
     nothing: false
   }
@@ -97,14 +97,7 @@ class OrderedScreen extends React.Component {
 
             <View style={styles.button}>
               <Button
-                title="詳細資料"
-                titleStyle={styles.orderButtonTitle}
-                buttonStyle={styles.orderButton}
-                containerStyle={styles.orderButtonBox}
-                onPress={()=>alert("敬請期待")}
-              />
-              <Button
-                title="取消"
+                title="評價"
                 titleStyle={styles.orderButtonTitle}
                 buttonStyle={styles.orderButton}
                 containerStyle={styles.orderButtonBox}

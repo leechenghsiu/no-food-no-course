@@ -20,8 +20,6 @@ class QrcodeScreen extends React.Component {
     />
 
     return {
-      // // headerTransparent: true,
-      // headerLeft: null
       header: null
     }
   };
@@ -66,8 +64,8 @@ class QrcodeScreen extends React.Component {
                 <Image source={require('../assets/images/icon.png')} style={{width: 40, height: 40}}/>
               </View>
             </View>
-            <Text style={[styles.text, {fontSize: 34}]}>{`$ ${this.state.balance}`}</Text>
-            <Text style={styles.text}>{`${this.state.cardId}（悠遊卡）`}</Text>
+            <Text style={[styles.text, {fontSize: 24}]}>您的取餐編號</Text>
+            <Text style={styles.text}>{this.props.navigation.state.params.orderId}</Text>
           </View>
           <TouchableOpacity
             style={styles.finish}
@@ -76,7 +74,7 @@ class QrcodeScreen extends React.Component {
               this.props.navigation.navigate('Ordering')
             }}
           >
-            <Text style={[styles.text, {marginBottom: 0}]}>完成付款</Text>
+            <Text style={[styles.text, {marginBottom: 0}]}>完成取餐</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
