@@ -21,14 +21,13 @@ class SignupScreen extends React.Component {
   };
 
   onCreateUser = async () => {
-    const { currentUser } = firebase.auth();
-    const { email, password, phone, username, id, cardId, balance } = this.state;
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
     this.setState({ error: ' ', loading: true });
+    const { email, password, phone, username, id, cardId, balance } = this.state;
     try {
       await firebase.auth().createUserWithEmailAndPassword(email, password);
-  
-      this.setState({ username, email, id, phone, cardId, balance });
+      const { currentUser } = firebase.auth();
+      let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+      this.setState({ username, email, id, phone, cardId, balance },()=>firebase.auth().signInWithEmailAndPassword(email, password));
       if(username!==null&&id!==null&&phone!==null&&cardId!==null) {
         await dbUserid.set({ email, phone, username, id, cardId, balance });
         this.setState({email: '', password: '', loading: false});
