@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, Platform, TouchableOpacity, StyleSheet, Dimensions, Image, StatusBar } from 'react-native';
+import { View, Text, Platform, TouchableOpacity, StyleSheet, Dimensions, Image, StatusBar, AsyncStorage } from 'react-native';
 import * as firebase from 'firebase';
 import { SafeAreaView } from 'react-navigation';
 import { Brightness, Permissions } from 'expo';
 
 import QrcodeApi from '../api/QrcodeApi';
+import api from '../api';
+import deviceStorage from '../services/deviceStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -23,14 +25,25 @@ class PayScreen extends React.Component {
       // await this.setState({ brightness: Brightness.getBrightnessAsync() });
       Brightness.setSystemBrightnessAsync(1);
     }
-
-    const { currentUser } = firebase.auth();
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    
+    const userId = await AsyncStorage.getItem('_id');
+    // const { currentUser } = firebase.auth();
+    // let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
     try {
-      let snapshot = await dbUserid.once('value');
-      let username = snapshot.val().username;
-      let balance = snapshot.val().balance;
-      let cardId = snapshot.val().cardId;
+      // let snapshot = await dbUserid.once('value');
+      // let username = snapshot.val().username;
+      // let balance = snapshot.val().balance;
+      // let cardId = snapshot.val().cardId;
+      await api.get(`user/${userId}`)
+      .then((response) => {
+        console.log(response.data.user);
+        // 缺學號
+        const { balance, easycard_number, username } = response.data.user;
+        this.setState({ balance, username, cardId: easycard_number });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
       this.setState({ username, balance, cardId });
     } catch (err) { }
   }

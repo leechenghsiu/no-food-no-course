@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, Image, ScrollView, Dimensions, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 
+import api from '../api';
+import deviceStorage from '../services/deviceStorage';
+
 const { width } = Dimensions.get('window');
 const cardWidth = width * 0.42;
 
@@ -17,16 +20,28 @@ class HomeScreen extends React.Component {
 
   async componentWillMount() {
     this.setState({ loading: true });
-    let dbMenu = firebase.database().ref(`/vendors`);
-    
-    try {
-      let snapshot = await dbMenu.once('value');
-      let vendors = Object.values(snapshot.val());
-      // 把店家 ID 加入
-      let vendorsWithId = vendors.map((item,index)=>Object.assign(item, {vendorId: Object.keys(snapshot.val())[index]}));
 
-      this.setState({ vendors: vendorsWithId });
-    } catch (err) { }
+    // let dbMenu = firebase.database().ref(`/vendors`);
+    // const userId = await AsyncStorage.getItem('_id');
+
+    try {
+      // let snapshot = await dbMenu.once('value');
+      // let vendors = Object.values(snapshot.val());
+      // // 把店家 ID 加入
+      // let vendorsWithId = vendors.map((item,index)=>Object.assign(item, {vendorId: Object.keys(snapshot.val())[index]}));
+
+      await api.get('vendor')
+      .then((response) => {
+        console.log(response.data);
+        // this.setState({ orders: [...response.data.order] });
+        this.setState({ vendors: [...response.data.vendor] });
+        console.log(this.state.vendors)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    } catch (err) { console.log(err) }
 
     this.setState({ loading: false });
   }
@@ -48,12 +63,12 @@ class HomeScreen extends React.Component {
           <View style={styles.container}>
             {this.state.vendors.map((vendor) => (
               <TouchableOpacity
-                key={vendor.username}
+                key={vendor._id}
                 style={styles.card}
                 onPress={() => this.goToPageTwo(vendor)}
               >
                 <Image source={{ uri: vendor.image }} style={{width: '100%', height: 100}} />
-                <Text style={styles.name}>{vendor.username}</Text>
+                <Text style={styles.name}>{vendor.vendorname}</Text>
                 <Text style={styles.description}>{vendor.description}</Text>
               </TouchableOpacity>
             ))}

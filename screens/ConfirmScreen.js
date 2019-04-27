@@ -1,9 +1,13 @@
 import React from 'react';
-import { View, Platform, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Image, DatePickerIOS, TimePickerAndroid } from 'react-native';
+import { View, Platform, Text, StatusBar, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Image, DatePickerIOS, TimePickerAndroid, AsyncStorage } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as firebase from 'firebase';
+import axios from 'axios';
+
+import api from '../api';
+import deviceStorage from '../services/deviceStorage';
 
 class ConfirmScreen extends React.Component {
   static navigationOptions = ({navigation}) => {
@@ -31,20 +35,28 @@ class ConfirmScreen extends React.Component {
       note: '',
       balance: '',
       finish: false,
-      name: ''
+      name: '',
+      userId: ''
     }
     this.setTime = this.setTime.bind(this);
   }
 
   async componentWillMount() {
-    const { currentUser } = firebase.auth();
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    const userId = await AsyncStorage.getItem('_id');
     try {
-      let snapshot = await dbUserid.once('value');
-      let balance = snapshot.val().balance;
-      let name = snapshot.val().username;
+      // let snapshot = await dbUserid.once('value');
+      // let balance = snapshot.val().balance;
+      // let name = snapshot.val().username;
+      await api.get(`user/${userId}`)
+      .then((response) => {
+        console.log(response.data.user);
+        this.setState({ balance: response.data.user.balance, name: response.data.user.username, userId: response.data.user._id });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-      this.setState({ balance, name });
+      
     } catch (err) { }
     this.setTime(this.state.chosenTime);
   }
@@ -75,20 +87,56 @@ class ConfirmScreen extends React.Component {
   handleSubmit = async () => {
     this.setState({ saving: true });
 
-    const { currentUser } = firebase.auth();
-    const { meal, total, vendorId } = this.props.navigation.state.params;
-    const { hour, minute, note, balance, finish, name } = this.state;
+    // const { currentUser } = firebase.auth();
+    const { meal, total, vendorId, vendorname } = this.props.navigation.state.params;
+    const { hour, minute, note, balance, name, userId } = this.state;
+    // const headers = {
+    //   'Authorization': 'Bearer ' + this.props.jwt
+    // };
     this.setState({ balance: balance-total });
-    let dbVendor = firebase.database().ref(`/vendors/${vendorId}/order`).push();
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order/${dbVendor.key}`);
-    let dbBalance = firebase.database().ref(`/users/${currentUser.uid}`);
-    // 店家和 User 都要 push 訂單
-    await dbVendor.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish, name });
-    await dbUserid.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish, name });
-    // User 扣款
-    await dbBalance.update({ balance: this.state.balance });
+    // let dbVendor = firebase.database().ref(`/vendors/${vendorId}/order`).push();
+    // let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order/${dbVendor.key}`);
+    // let dbBalance = firebase.database().ref(`/users/${currentUser.uid}`);
+    // // 店家和 User 都要 push 訂單
+    // await dbVendor.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish, name });
+    // await dbUserid.set({ meal: [...meal], time: `${hour}:${minute}`, note, total, vendor: this.props.navigation.state.params.name, finish, name });
+    // // User 扣款
+    // await dbBalance.update({ balance: this.state.balance });
+    try {
+      // 下訂單
+      await api.post('orders', {
+         list: [...meal],
+         hour,
+         minute,
+         remark: note,
+         total,
+         vendor: { vendorId, vendorname },
+         user: { userId, username: name }
+      })
+      .then((response) => {
+        console.log(response);
+        // this.setState({ meals: [...response.data] });
+        // console.log(this.state.meals)
+      })
+      .catch((error) => {
+        console.log('error');
+      });
 
-    this.setState({ saving: false }, ()=>this.props.navigation.navigate('Ordering'));
+      // 改餘額
+      await api.patch(`user/${userId}`, [
+        {"propName": "balance", "value": this.state.balance}
+       ])
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      this.setState({ saving: false }, ()=>this.props.navigation.navigate('Ordering'));
+    } catch (err) { console.log(err) }
+
+    
   }
 
   renderButton() {
@@ -114,12 +162,12 @@ class ConfirmScreen extends React.Component {
     const { meal, name, total, vendorId } = this.props.navigation.state.params;
     
     const renderMeal = meal.map(meal=>(
-      <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
+      <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.product}>
         <View style={{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?0:2, height: 16 , borderRadius: 2 }}>
-          <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.count}</Text>
+          <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.quantity}</Text>
         </View>
         <View style={{ flex: 5 }}>
-          <Text style={styles.mealName}>{meal.name}</Text>
+          <Text style={styles.mealName}>{meal.product}</Text>
         </View>
         <View style={{ flex: 2 }}>
           <Text style={styles.mealPrice}>{`NT$ ${meal.price}`}</Text>

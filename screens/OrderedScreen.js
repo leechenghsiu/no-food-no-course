@@ -1,7 +1,10 @@
 import React from 'react';
-import { View, Platform, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Platform, Text, ScrollView, StyleSheet, ActivityIndicator, AsyncStorage } from 'react-native';
 import * as firebase from 'firebase';
 import { Button } from 'react-native-elements';
+
+import api from '../api';
+import deviceStorage from '../services/deviceStorage';
 
 class OrderedScreen extends React.Component {
   state = {
@@ -24,39 +27,60 @@ class OrderedScreen extends React.Component {
   async componentWillMount() {
     this.setState({ loading: true });
 
-    const { currentUser } = firebase.auth();
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order`);
-    try {
-      let mealSnapshot = await dbUserid.once('value');
-      let orders = Object.values(mealSnapshot.val());
-      // 把訂單 ID 加入
-      let ordersWithId = orders.map((item,index)=>Object.assign(item, {orderId: Object.keys(mealSnapshot.val())[index]}));
-      // sort
-      ordersWithId.sort((a, b) => a - b).reverse();
+    // const { currentUser } = firebase.auth();
+    // let dbUserid = firebase.database().ref(`/users/${currentUser.uid}/order`);
+    // const userId =  await deviceStorage.loadToken("_id");
+    const userId = await AsyncStorage.getItem('_id');
 
-      this.setState({ orders: ordersWithId },()=>console.log(this.state.orders));
+    try {
+      // let mealSnapshot = await dbUserid.once('value');
+      // let orders = Object.values(mealSnapshot.val());
+      // // 把訂單 ID 加入
+      // let ordersWithId = orders.map((item,index)=>Object.assign(item, {orderId: Object.keys(mealSnapshot.val())[index]}));
+      // // sort
+      // ordersWithId.sort((a, b) => a - b).reverse();
+
+      // this.setState({ orders: ordersWithId });
+      console.log(userId);
+      await api.get(`orders/user/${userId}`)
+      .then((response) => {
+        console.log(response.data.order);
+        response.data.order.sort((a, b) => a - b).reverse();
+        this.setState({ orders: [...response.data.order] });
+        console.log(this.state.orders)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     } catch (err) { this.setState({ nothing: true }) }
 
     this.setState({ loading: false });
   }
 
   render() {
-    if (this.state.orders.filter(order=>order.finish===true).length<1 || this.state.nothing===true) {
+    if (this.state.loading) {
+      return (
+        <View style={{flex: 1, padding: 20, backgroundColor: 'rgb(249,249,249)', justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large"/>
+        </View>
+      )
+    }
+    if (this.state.orders.filter(order=>order.status===true).length<1 || this.state.nothing===true) {
       return (
         <View style={{flex: 1, padding: 25, backgroundColor: 'rgb(249,249,249)'}}>
           <Text>目前沒有訂單</Text>
         </View>
       )
     } else {
-      const renderOrder = this.state.orders.filter(order=>order.finish===true).map((order,index)=>{
-        const mealToArray = Object.values(order.meal);
-        const renderMeal = mealToArray.map(meal=>(
-          <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.name}>
+      const renderOrder = this.state.orders.filter(order=>order.status===true).map((order,index)=>{
+        // const mealToArray = Object.values(order.meal);
+        const renderMeal = order.list.map(meal=>(
+          <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.product}>
             <View style={{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?0:2, height: 16 , borderRadius: 2 }}>
-              <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.count}</Text>
+              <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{meal.quantity}</Text>
             </View>
             <View style={{ flex: 5 }}>
-              <Text style={styles.mealName}>{meal.name}</Text>
+              <Text style={styles.mealName}>{meal.product}</Text>
             </View>
             <View style={{ flex: 2 }}>
               <Text style={styles.mealPrice}>{`NT$ ${meal.price}`}</Text>
@@ -64,12 +88,12 @@ class OrderedScreen extends React.Component {
           </View>
         ))
         return(
-          <View style={[styles.order, index===0?{marginTop: 20}:null ]} key={order.orderId}>
+          <View style={[styles.order, index===0?{marginTop: 20}:null ]} key={order._id}>
             <View style={styles.orderTop}>
-              <Text style={styles.vendor}>{`${order.vendor}`}</Text>
+              <Text style={styles.vendor}>{`${order.vendor.vendorname}`}</Text>
               <View style={styles.timeBox}>
                 <Text style={[styles.time, {fontSize: 12}]}>取餐時間</Text>
-                <Text style={styles.time}>{`${order.time}`}</Text>
+                <Text style={styles.time}>{`${order.hour}:${order.minute}`}</Text>
               </View>
             </View>
 
@@ -85,7 +109,7 @@ class OrderedScreen extends React.Component {
             <View style={[styles.orderBottom, {}]}>
               <Text style={styles.title}>備註</Text>
               <View style={styles.note}>
-                <Text style={{color: 'rgb(64,64,64)'}}>{`${order.note}`}</Text>
+                <Text style={{color: 'rgb(64,64,64)'}}>{`${order.remark}`}</Text>
               </View>
             </View>
 
