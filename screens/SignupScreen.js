@@ -38,7 +38,7 @@ class SignupScreen extends React.Component {
 
         // 註冊(Axios 不能傳 form data !!!)
         await api.post('user/signup', {
-          email, password, phone, easycard_number: cardId, username
+          email, password, phone, easycard_number: cardId, username, studentId: id
         })
         .then((response) => {
           console.log('Signup Success');
@@ -53,7 +53,7 @@ class SignupScreen extends React.Component {
         .then((response) => {
           console.log('Login Success');
           deviceStorage.saveToken("id_token", response.data.token);
-          eviceStorage.saveToken("_id", response.data.user._id);
+          deviceStorage.saveToken("_id", response.data.user._id);
 
           this.setState({email: '', password: '', loading: false});
           this.props.navigation.navigate('Main');
