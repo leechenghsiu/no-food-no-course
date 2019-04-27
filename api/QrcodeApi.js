@@ -1,6 +1,9 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, AsyncStorage } from 'react-native';
 import * as firebase from 'firebase';
+
+import api from '../api';
+import deviceStorage from '../services/deviceStorage';
 
 class QrcodeApi extends React.Component {
   state = {
@@ -10,13 +13,25 @@ class QrcodeApi extends React.Component {
   };
 
   async componentDidMount() {
-    const { currentUser } = firebase.auth();
-    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    const userId = await AsyncStorage.getItem('_id');
+    // const { currentUser } = firebase.auth();
+    // let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
     try {
-      let snapshot = await dbUserid.once('value');
-      let username = snapshot.val().username;
-      let balance = snapshot.val().balance;
-      this.setState({ username, balance, uid: currentUser.uid });
+      // let snapshot = await dbUserid.once('value');
+      // let username = snapshot.val().username;
+      // let balance = snapshot.val().balance;
+      // this.setState({ username, balance, uid: currentUser.uid });
+      await api.get(`user/${userId}`)
+      .then((response) => {
+        console.log(response.data.user);
+        // 缺學號
+        const { balance, _id, username } = response.data.user;
+        this.setState({ balance, username, uid: _id });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
     } catch (err) { }
   }
   render() {

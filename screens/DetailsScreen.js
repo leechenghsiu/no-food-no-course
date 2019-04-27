@@ -4,6 +4,9 @@ import { Tile } from 'react-native-elements';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
 
+import api from '../api';
+import deviceStorage from '../services/deviceStorage';
+
 class Details extends Component {
   static navigationOptions = ({navigation}) => {
     const back = <Ionicons
@@ -22,11 +25,29 @@ class Details extends Component {
 
   state = {
     meal:[],
-    total: 0
+    total: 0,
+    meals: []
+  }
+
+  async componentWillMount() {
+    const _id = this.props.navigation.state.params._id;
+    try {
+      await api.get(`products/${_id}`)
+      .then((response) => {
+        console.log(response.data);
+        this.setState({ meals: [...response.data] });
+        console.log(this.state.meals)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    } catch (err) { console.log(err) }
   }
 
   handleSubmit = () => {
-    this.props.navigation.navigate('Confirm',{ meal: this.state.meal, name: this.props.navigation.state.params.username, total: this.state.total, vendorId: this.props.navigation.state.params.vendorId })
+    console.log(this.state.meal)
+    this.props.navigation.navigate('Confirm',{ meal: this.state.meal, vendorname: this.props.navigation.state.params.vendorname, total: this.state.total, vendorId: this.props.navigation.state.params._id })
   }
 
   handleCount = () => {
@@ -35,7 +56,7 @@ class Details extends Component {
         total: 0
       })
     } else {
-      const sum = this.state.meal.map(x => x.price * x.count).reduce((a,b) => a+b);
+      const sum = this.state.meal.map(x => x.price * x.quantity).reduce((a,b) => a+b);
       this.setState({
         total: sum
       })
@@ -43,20 +64,21 @@ class Details extends Component {
   }
 
   render() {
-    const { username,
-            image,
+    const { vendorname,
             description,
-            meals,
-            vendorId
+            image,
+            _id
     } = this.props.navigation.state.params;
+
+    const { meals } = this.state;
 
     const renderMeals = meals.map(meal=>{
       // 增加餐點
       const handleIncreaseMeal = meal => {
         //找到現有的餐點
-        if(this.state.meal.find(x => x.name === meal.name)){
+        if(this.state.meal.find(x => x.product === meal.name)){
           let oldStates = this.state.meal;
-          oldStates.find(x => x.name === meal.name).count += 1;
+          oldStates.find(x => x.product === meal.name).quantity += 1;
           this.setState({
             meal: [
               ...oldStates
@@ -68,7 +90,7 @@ class Details extends Component {
           this.setState({
             meal: [
               ...this.state.meal,
-              { name: meal.name, price: meal.price, count: 1 }
+              { product: meal.name, price: meal.price, quantity: 1 }
             ]
           },()=>this.handleCount())
         }
@@ -77,17 +99,17 @@ class Details extends Component {
       // 減少餐點
       const handleDecreaseMeal = meal => {
         //找到現有的餐點
-        if(this.state.meal.find(x => x.name === meal.name)){
+        if(this.state.meal.find(x => x.product === meal.name)){
           let oldStates = this.state.meal;
-          if(oldStates.find(x => x.name === meal.name).count === 1){
-            oldStates.splice(oldStates.findIndex(x => x.name === meal.name),1)
+          if(oldStates.find(x => x.product === meal.name).quantity === 1){
+            oldStates.splice(oldStates.findIndex(x => x.product === meal.name),1)
             this.setState({
               meal: [
                 ...oldStates
               ]
             },()=>this.handleCount());
           } else {
-            oldStates.find(x => x.name === meal.name).count -= 1;
+            oldStates.find(x => x.product === meal.name).quantity -= 1;
             this.setState({
               meal: [
                 ...oldStates
@@ -104,8 +126,8 @@ class Details extends Component {
       return(
         <View style={styles.meal} key={meal.name}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={[{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?8:10, height: 16 , borderRadius: 2},this.state.meal.find(x => x.name === meal.name)?{display: 'flex'}:{backgroundColor: 'transparent'}]}>
-              <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{this.state.meal.find(x => x.name === meal.name)?this.state.meal.find(x => x.name === meal.name).count:''}</Text>
+            <View style={[{ marginRight: 6, alignItems: 'flex-end', backgroundColor: 'rgb(141,216,227)', marginVertical: Platform.OS === "ios"?8:10, height: 16 , borderRadius: 2},this.state.meal.find(x => x.product === meal.name)?{display: 'flex'}:{backgroundColor: 'transparent'}]}>
+              <Text style={[styles.mealCount, {lineHeight: Platform.OS === "ios"?16:17}]}>{this.state.meal.find(x => x.product === meal.name)?this.state.meal.find(x => x.product === meal.name).quantity:''}</Text>
             </View>
             <View style={{flexDirection: 'column'}}>
               <Text style={styles.mealName}>{meal.name}</Text>
@@ -134,7 +156,7 @@ class Details extends Component {
               featured
             />
             <View style={ styles.container }>
-              <Text style={styles.name}>{username}</Text>
+              <Text style={styles.name}>{vendorname}</Text>
               <Text style={styles.description}>{description}</Text>
               <Text style={[styles.name, {marginBottom: 20}]}>餐點</Text>
               {renderMeals}
