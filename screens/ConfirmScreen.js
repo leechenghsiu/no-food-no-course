@@ -159,7 +159,7 @@ class ConfirmScreen extends React.Component {
   }
 
   render() {
-    const { meal, name, total, vendorId } = this.props.navigation.state.params;
+    const { meal, total, vendorname } = this.props.navigation.state.params;
     
     const renderMeal = meal.map(meal=>(
       <View style={{ flex: 1, flexDirection: 'row', marginVertical: 5 }} key={meal.product}>
@@ -184,7 +184,7 @@ class ConfirmScreen extends React.Component {
                 <View style={{flex: 1, flexDirection: 'row'}}>
                   <View style={{flex: 1}}></View>
                   <View style={{flex: 1, borderBottomWidth: 1}}>
-                    <Text style={styles.title}>{name}</Text>
+                    <Text style={styles.title}>{vendorname}</Text>
                   </View>
                   <View style={{flex: 1}}></View>
                 </View>
@@ -208,7 +208,6 @@ class ConfirmScreen extends React.Component {
                     />
                     :<TouchableOpacity style={styles.timePickerAndroid} onPress={()=>this.setTimeAndroid()} >
                       <Text style={styles.timePickerAndroidText}>{`${this.state.hour} : ${this.state.minute}`}</Text>
-                      <Text style={[styles.timePickerAndroidText, {fontSize: 24}]}>EDIT</Text>
                     </TouchableOpacity>
                     }
                   </View>
@@ -306,7 +305,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'flex-end',
     paddingVertical: 50
   },
