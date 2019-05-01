@@ -71,14 +71,6 @@ class LoginScreen extends Component {
             onPress={()=>this.props.navigation.navigate('Signup')}
           />
         </View>
-        <Button
-          title="超級登入"
-          type="clear"
-          titleStyle={styles.signupButtonTitle}
-          buttonStyle={styles.signupButton}
-          containerStyle={[styles.signupButtonBox, {marginTop: 100}]}
-          onPress={() => this.props.navigation.navigate('Main')}
-        />
       </View>
     );
   }
