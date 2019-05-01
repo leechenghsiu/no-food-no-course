@@ -24,7 +24,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ntuedtd.nofoodnocourse"
+    },
+    "android": {
+      "package": "com.ntuedtd.nofoodnocourse"
     },
     "githubUrl": "https://github.com/leechenghsiu/no-food-no-course"
   }
