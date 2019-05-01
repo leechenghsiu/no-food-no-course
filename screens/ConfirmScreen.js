@@ -136,6 +136,14 @@ class ConfirmScreen extends React.Component {
       this.setState({ saving: false }, ()=>this.props.navigation.navigate('Ordering'));
     } catch (err) { console.log(err) }
 
+    // 推播
+    await api.get(`pushToken/${vendorId}`)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
     
   }
 
